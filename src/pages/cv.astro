@@ -1,15 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/Section.astro';
+import Heading from '../components/Heading.astro';
 import Placeholder from '../components/Placeholder.astro';
 ---
 
 <BaseLayout title="CV">
   <Section title="CV">
     <Placeholder label="link to PDF CV" />
-    <h2 class="text-xl font-semibold">Education</h2>
+    <Heading>Education</Heading>
     <Placeholder label="education" />
-    <h2 class="text-xl font-semibold">Experience</h2>
+    <Heading>Experience</Heading>
     <Placeholder label="experience" />
   </Section>
 </BaseLayout>

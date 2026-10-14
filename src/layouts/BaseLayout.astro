@@ -21,12 +21,14 @@ const fullTitle = title === 'Home' ? 'Minzhen Zhang' : `${title} · Minzhen Zhan
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{fullTitle}</title>
   </head>
-  <body class="flex min-h-screen flex-col font-sans antialiased">
-    <Nav />
-    <main class="flex-1">
+  <body class="flex min-h-screen flex-col antialiased">
+    <div class="w-full max-w-[36rem] px-6 sm:px-8">
+      <Nav />
+    </div>
+    <main class="w-full max-w-[36rem] flex-1 px-6 pt-16 pb-24 text-xl leading-[1.35] sm:px-8 sm:pt-20 sm:text-2xl">
       <slot />
     </main>
-    <footer class="border-t border-border py-6 text-center text-sm text-muted">
+    <footer class="px-6 pb-8 font-sans text-[13px] text-muted sm:px-8">
       © {new Date().getFullYear()} Minzhen Zhang
     </footer>
   </body>

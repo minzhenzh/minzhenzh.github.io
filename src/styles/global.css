@@ -1,48 +1,43 @@
+@import "@fontsource-variable/newsreader/opsz.css";
+@import "@fontsource-variable/newsreader/opsz-italic.css";
 @import "tailwindcss";
 
-/* Design tokens. Light by default; dark follows the system setting. */
+/* Design tokens: white page, near-black serif text. */
 :root {
   --bg: #ffffff;
-  --surface: #f8fafc;
-  --fg: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --accent: #2563eb;
-
-  /* Hero stays dark in both modes. */
-  --hero-bg: #0b1120;
-  --hero-fg: #f8fafc;
-  --hero-muted: #94a3b8;
+  --fg: #1f2322;
+  --muted: #6b6f6e;
+  --rule: #d9d9d6;
+  --highlight: #e8dccf;
 
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f172a;
-    --surface: #111c33;
-    --fg: #e2e8f0;
-    --muted: #94a3b8;
-    --border: #1e293b;
-    --accent: #60a5fa;
-
-    color-scheme: dark;
-  }
-}
-
 @theme inline {
   --color-bg: var(--bg);
-  --color-surface: var(--surface);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
-  --color-border: var(--border);
-  --color-accent: var(--accent);
-  --color-hero-bg: var(--hero-bg);
-  --color-hero-fg: var(--hero-fg);
-  --color-hero-muted: var(--hero-muted);
+  --color-rule: var(--rule);
+  --color-highlight: var(--highlight);
+
+  --font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
 }
 
 body {
   background-color: var(--bg);
   color: var(--fg);
+  font-family: var(--font-serif);
+}
+
+/* Prose links: thin, light underline that darkens on hover. */
+.prose-link {
+  text-decoration-line: underline;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 150ms;
+}
+
+.prose-link:hover {
+  text-decoration-color: var(--fg);
 }
