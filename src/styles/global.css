@@ -2,15 +2,69 @@
 @import "@fontsource-variable/newsreader/opsz-italic.css";
 @import "tailwindcss";
 
-/* Design tokens: white page, near-black serif text. */
+/* Design tokens. Light: white page, near-black serif text.
+   Dark follows the system setting unless the toggle set data-theme on <html>. */
 :root {
   --bg: #ffffff;
   --fg: #1f2322;
   --muted: #6b6f6e;
   --rule: #d9d9d6;
   --highlight: #e8dccf;
+  --figure-filter: none;
 
   color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161716;
+    --fg: #e6e4df;
+    --muted: #9a9b97;
+    --rule: #3a3c3a;
+    --highlight: #4a4136;
+    --figure-filter: brightness(0.85);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #161716;
+  --fg: #e6e4df;
+  --muted: #9a9b97;
+  --rule: #3a3c3a;
+  --highlight: #4a4136;
+  --figure-filter: brightness(0.85);
+
+  color-scheme: dark;
+}
+
+/* Overview figures are usually white; tone them down on a dark page. */
+.figure {
+  filter: var(--figure-filter);
+}
+
+/* Theme toggle shows the mode you'd switch to: moon in light, sun in dark. */
+.theme-icon-sun {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-sun {
+    display: block;
+  }
+
+  :root:not([data-theme="light"]) .theme-icon-moon {
+    display: none;
+  }
+}
+
+:root[data-theme="dark"] .theme-icon-sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .theme-icon-moon {
+  display: none;
 }
 
 @theme inline {

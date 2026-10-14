@@ -20,6 +20,13 @@ const fullTitle = title === 'Home' ? 'Minzhen Zhang' : `${title} · Minzhen Zhan
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{fullTitle}</title>
+    <script is:inline>
+      // Apply a saved theme choice before first paint to avoid a flash.
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
   </head>
   <body class="flex min-h-screen flex-col antialiased">
     <div class="mx-auto w-full max-w-page px-6 sm:px-8">

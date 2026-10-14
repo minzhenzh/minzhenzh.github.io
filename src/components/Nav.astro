@@ -1,4 +1,6 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
+
 const links = [
   { href: '/#research', label: 'Research & Projects' },
 ];
@@ -9,24 +11,27 @@ const current = normalize(Astro.url.pathname);
 
 <header class="flex items-baseline justify-between gap-6 pt-8">
   <a href="/" class="text-lg" aria-current={current === '/' ? 'page' : undefined}>Minzhen Zhang</a>
-  <nav>
-    <ul class="flex gap-5 font-sans text-[13px]">
-      {
-        links.map(({ href, label }) => (
-          <li>
-            <a
-              href={href}
-              aria-current={current === href ? 'page' : undefined}
-              class:list={[
-                'transition-colors hover:text-fg',
-                current === href ? 'text-fg underline decoration-highlight decoration-4 underline-offset-[-1px]' : 'text-muted',
-              ]}
-            >
-              {label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
+  <div class="flex items-center gap-5">
+    <nav>
+      <ul class="flex gap-5 font-sans text-[13px]">
+        {
+          links.map(({ href, label }) => (
+            <li>
+              <a
+                href={href}
+                aria-current={current === href ? 'page' : undefined}
+                class:list={[
+                  'transition-colors hover:text-fg',
+                  current === href ? 'text-fg underline decoration-highlight decoration-4 underline-offset-[-1px]' : 'text-muted',
+                ]}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
 </header>
