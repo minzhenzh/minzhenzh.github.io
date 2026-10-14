@@ -1,15 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Heading from '../components/Heading.astro';
-import ItemList from '../components/ItemList.astro';
-import PublicationItem from '../components/PublicationItem.astro';
-import ProjectItem from '../components/ProjectItem.astro';
-import { getProjects, getResearch } from '../lib/content';
+import Placeholder from '../components/Placeholder.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { getWork } from '../lib/content';
 
-const selected = [
-  ...(await getResearch()).filter((e) => e.data.featured),
-  ...(await getProjects()).filter((e) => e.data.featured),
-].sort((a, b) => b.data.year - a.data.year);
+const work = await getWork();
 ---
 
 <BaseLayout title="Home">
@@ -20,26 +16,6 @@ const selected = [
     <p>
       I’m interested in AI agents, software engineering, computer graphics, and game development, particularly in building virtual worlds and characters, and in understanding how people play and interact within them.
     </p>
-    <p>
-      More on my <a href="/research/" class="prose-link">research</a>, <a href="/projects/" class="prose-link">projects</a>, and <a href="/cv/" class="prose-link">CV</a>.
-    </p>
-
-    {
-      selected.length > 0 && (
-        <>
-          <Heading>Selected work</Heading>
-          <ItemList>
-            {selected.map((entry) =>
-              entry.collection === 'research' ? (
-                <PublicationItem entry={entry} showSummary={false} />
-              ) : (
-                <ProjectItem entry={entry} />
-              ),
-            )}
-          </ItemList>
-        </>
-      )
-    }
 
     {/* News: uncomment once there is something to announce.
     <Heading>News</Heading>
@@ -50,5 +26,22 @@ const selected = [
       </li>
     </ul>
     */}
+
+    <section id="research" class="scroll-mt-8">
+      <Heading>Research &amp; Projects</Heading>
+      {
+        work.length > 0 ? (
+          <ul class="mt-6 grid gap-x-8 gap-y-10 sm:grid-cols-2">
+            {work.map((entry) => (
+              <WorkCard entry={entry} />
+            ))}
+          </ul>
+        ) : (
+          <div class="mt-6">
+            <Placeholder label="papers and projects" />
+          </div>
+        )
+      }
+    </section>
   </div>
 </BaseLayout>

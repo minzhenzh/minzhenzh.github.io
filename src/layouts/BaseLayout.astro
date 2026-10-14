@@ -22,13 +22,13 @@ const fullTitle = title === 'Home' ? 'Minzhen Zhang' : `${title} · Minzhen Zhan
     <title>{fullTitle}</title>
   </head>
   <body class="flex min-h-screen flex-col antialiased">
-    <div class="mx-auto w-full max-w-[36rem] px-6 sm:px-8">
+    <div class="mx-auto w-full max-w-page px-6 sm:px-8">
       <Nav />
     </div>
-    <main class="mx-auto w-full max-w-[36rem] flex-1 px-6 pt-16 pb-24 text-xl leading-[1.35] sm:px-8 sm:pt-20 sm:text-2xl">
+    <main class="mx-auto w-full max-w-page flex-1 px-6 pt-16 pb-24 text-lg leading-normal sm:px-8 sm:pt-20 sm:text-xl">
       <slot />
     </main>
-    <footer class="mx-auto w-full max-w-[36rem] px-6 pb-8 font-sans text-[13px] text-muted sm:px-8">
+    <footer class="mx-auto w-full max-w-page px-6 pb-8 font-sans text-[13px] text-muted sm:px-8">
       © {new Date().getFullYear()} Minzhen Zhang
     </footer>
   </body>

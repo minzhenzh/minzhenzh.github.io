@@ -21,6 +21,9 @@
   --color-highlight: var(--highlight);
 
   --font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
+
+  /* Page column width (incl. side padding): ~65-70 characters per line at body size. */
+  --container-page: 44rem;
 }
 
 body {
