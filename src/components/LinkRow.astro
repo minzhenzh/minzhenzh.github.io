@@ -1,0 +1,18 @@
+---
+interface Props {
+  links: Partial<Record<'paper' | 'code' | 'demo' | 'video', string>>;
+}
+
+const labels = { paper: 'Paper', code: 'Code', demo: 'Demo', video: 'Video' } as const;
+const entries = (Object.keys(labels) as (keyof typeof labels)[])
+  .filter((key) => Astro.props.links[key])
+  .map((key) => ({ label: labels[key], href: Astro.props.links[key]! }));
+---
+
+{
+  entries.map(({ label, href }) => (
+    <a href={href} class="prose-link text-fg">
+      {label}
+    </a>
+  ))
+}

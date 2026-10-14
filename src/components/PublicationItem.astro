@@ -1,0 +1,33 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Meta from './Meta.astro';
+import LinkRow from './LinkRow.astro';
+
+interface Props {
+  entry: CollectionEntry<'research'>;
+  showSummary?: boolean;
+}
+
+const { entry, showSummary = true } = Astro.props;
+const { title, authors, venue, year, summary, links } = entry.data;
+const SELF = 'Minzhen Zhang';
+---
+
+<li>
+  {links.paper ? <a href={links.paper} class="prose-link">{title}</a> : title}
+  <p class="mt-1 text-base text-muted">
+    {
+      authors.map((name, i) => (
+        <>
+          {i > 0 && ', '}
+          {name === SELF ? <span class="text-fg">{name}</span> : name}
+        </>
+      ))
+    }
+  </p>
+  {showSummary && summary && <p class="mt-1 text-base text-muted">{summary}</p>}
+  <Meta>
+    <span>{venue} {year}</span>
+    <LinkRow links={links} />
+  </Meta>
+</li>

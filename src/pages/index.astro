@@ -1,14 +1,54 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Placeholder from '../components/Placeholder.astro';
+import Heading from '../components/Heading.astro';
+import ItemList from '../components/ItemList.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import ProjectItem from '../components/ProjectItem.astro';
+import { getProjects, getResearch } from '../lib/content';
+
+const selected = [
+  ...(await getResearch()).filter((e) => e.data.featured),
+  ...(await getProjects()).filter((e) => e.data.featured),
+].sort((a, b) => b.data.year - a.data.year);
 ---
 
 <BaseLayout title="Home">
   <div class="space-y-6">
-    <p class="font-medium">TODO: one-line introduction</p>
-    <Placeholder label="short bio" />
+    <p class="font-medium">
+      I’m an M.Sc. student in Computer Science at the University of Guelph, under the supervision of <a href="http://socs.uoguelph.ca/~lliao01/" class="prose-link">Lizhi Liao</a>.
+    </p>
+    <p>
+      I’m interested in AI agents, software engineering, computer graphics, and game development, particularly in building virtual worlds and characters, and in understanding how people play and interact within them.
+    </p>
     <p>
       More on my <a href="/research/" class="prose-link">research</a>, <a href="/projects/" class="prose-link">projects</a>, and <a href="/cv/" class="prose-link">CV</a>.
     </p>
+
+    {
+      selected.length > 0 && (
+        <>
+          <Heading>Selected work</Heading>
+          <ItemList>
+            {selected.map((entry) =>
+              entry.collection === 'research' ? (
+                <PublicationItem entry={entry} showSummary={false} />
+              ) : (
+                <ProjectItem entry={entry} />
+              ),
+            )}
+          </ItemList>
+        </>
+      )
+    }
+
+    {/* News: uncomment once there is something to announce.
+    <Heading>News</Heading>
+    <ul class="space-y-3">
+      <li>
+        <span class="font-sans text-[13px] text-muted">2026-10</span>
+        <p>TODO: news item</p>
+      </li>
+    </ul>
+    */}
   </div>
 </BaseLayout>
