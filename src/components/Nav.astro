@@ -21,7 +21,7 @@ const current = normalize(Astro.url.pathname);
                 href={href}
                 aria-current={current === href ? 'page' : undefined}
                 class:list={[
-                  'transition-colors hover:text-accent',
+                  'transition-colors hover:text-fg',
                   current === href ? 'text-fg underline decoration-highlight decoration-4 underline-offset-[-1px]' : 'text-muted',
                 ]}
               >

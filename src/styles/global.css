@@ -2,154 +2,41 @@
 @import "@fontsource-variable/newsreader/opsz-italic.css";
 @import "tailwindcss";
 
-/* Design tokens. Light: white page, near-black serif text, deep-gold accent.
-   Dark follows the system setting unless the toggle set data-theme on <html>;
-   its navy page color comes from the same family as the bottom of the hero sky. */
+/* Design tokens. Light: white page, near-black serif text.
+   Dark follows the system setting unless the toggle set data-theme on <html>. */
 :root {
   --bg: #ffffff;
   --fg: #1f2322;
   --muted: #6b6f6e;
   --rule: #d9d9d6;
   --highlight: #e8dccf;
-  /* Star gold, deepened for text contrast on white (5.3:1). */
-  --accent: #8f6210;
   --figure-filter: none;
-
-  /* Night hero: identical in both modes. */
-  --sky-top: #050a1a;
-  --sky-mid: #0b1734;
-  --sky-bottom: #1a3163;
-  --hero-fg: #eef1f8;
-  --hero-muted: #aab5cf;
-  --hero-rule: rgb(238 241 248 / 0.35);
-  --star: #f6c85f;
-  --star-glow: rgb(246 200 95 / 0.6);
-  --tree: #02050d;
-  --thread: rgb(255 255 255 / 0.32);
-
-  /* Light "dawn" fade below the hero: night blue -> soft light blues -> a hint of
-     warm -> page. Every stop is clearly blue or clearly warm and very light by the
-     time the hue turns, so the blend never passes through gray. */
-  --dawn-1: #24427f;
-  --dawn-2: #4f78bb;
-  --dawn-3: #93b8e2;
-  --dawn-4: #cfe1f4;
-  --dawn-warm: #fbeadc;
-  --hero-fade-height: 26rem;
-  --hero-fade: linear-gradient(
-    to bottom,
-    var(--sky-bottom) 0%,
-    var(--dawn-1) 12%,
-    var(--dawn-2) 30%,
-    var(--dawn-3) 50%,
-    var(--dawn-4) 68%,
-    var(--dawn-warm) 84%,
-    var(--bg) 100%
-  );
 
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0c1631;
-    --fg: #e8eaf1;
-    --muted: #9ba6bf;
-    --rule: #26355a;
-    --highlight: #2b3a63;
-    --accent: var(--star);
+    --bg: #161716;
+    --fg: #e6e4df;
+    --muted: #9a9b97;
+    --rule: #3a3c3a;
+    --highlight: #4a4136;
     --figure-filter: brightness(0.85);
-    --hero-fade-height: 9rem;
-    --hero-fade: linear-gradient(to bottom, var(--sky-bottom), var(--bg));
 
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #0c1631;
-  --fg: #e8eaf1;
-  --muted: #9ba6bf;
-  --rule: #26355a;
-  --highlight: #2b3a63;
-  --accent: var(--star);
+  --bg: #161716;
+  --fg: #e6e4df;
+  --muted: #9a9b97;
+  --rule: #3a3c3a;
+  --highlight: #4a4136;
   --figure-filter: brightness(0.85);
-  --hero-fade-height: 9rem;
-  --hero-fade: linear-gradient(to bottom, var(--sky-bottom), var(--bg));
 
   color-scheme: dark;
-}
-
-/* Night hero. Inside it the page tokens point at hero tokens, so the header,
-   theme toggle and links adapt without hero-specific classes. */
-.hero {
-  --fg: var(--hero-fg);
-  --muted: var(--hero-muted);
-  --rule: var(--hero-rule);
-  --accent: var(--star);
-
-  position: relative;
-  isolation: isolate;
-  background: var(--sky-bottom);
-  color: var(--fg);
-  color-scheme: dark;
-}
-
-.hero-night {
-  background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 45%, var(--sky-bottom) 100%);
-}
-
-.hero-fade {
-  margin-top: -1px; /* overlap the sky so no hairline shows between them */
-  height: var(--hero-fade-height);
-  background: var(--hero-fade);
-}
-
-@media (max-width: 639px) {
-  .hero-fade {
-    height: calc(var(--hero-fade-height) * 0.7);
-  }
-}
-
-.hero-text {
-  text-shadow: 0 1px 14px var(--sky-top);
-}
-
-/* Light-mode variant B: a rounded card on the light page. Dark mode always fades. */
-.hero[data-light-variant="card"] {
-  margin: 0.75rem;
-  border-radius: 1.25rem;
-  overflow: hidden;
-}
-
-.hero[data-light-variant="card"] .hero-fade {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .hero[data-light-variant="card"] {
-    margin: 1rem;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .hero[data-light-variant="card"] {
-    margin: 0;
-    border-radius: 0;
-  }
-
-  :root:not([data-theme="light"]) .hero[data-light-variant="card"] .hero-fade {
-    display: block;
-  }
-}
-
-:root[data-theme="dark"] .hero[data-light-variant="card"] {
-  margin: 0;
-  border-radius: 0;
-}
-
-:root[data-theme="dark"] .hero[data-light-variant="card"] .hero-fade {
-  display: block;
 }
 
 /* Overview figures are usually white; tone them down on a dark page. */
@@ -186,7 +73,6 @@
   --color-muted: var(--muted);
   --color-rule: var(--rule);
   --color-highlight: var(--highlight);
-  --color-accent: var(--accent);
 
   --font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
 
@@ -202,20 +88,17 @@ body {
   font-family: var(--font-serif);
 }
 
-/* Prose links: thin, light underline; gold on hover. */
+/* Prose links: thin, light underline that darkens on hover. */
 .prose-link {
   text-decoration-line: underline;
   text-decoration-color: var(--rule);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
-  transition:
-    color 150ms,
-    text-decoration-color 150ms;
+  transition: text-decoration-color 150ms;
 }
 
 .prose-link:hover {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
+  text-decoration-color: var(--fg);
 }
 
 /* Markdown bodies (project pages). */
@@ -250,8 +133,7 @@ body {
 }
 
 .prose a:hover {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
+  text-decoration-color: var(--fg);
 }
 
 .prose code {
