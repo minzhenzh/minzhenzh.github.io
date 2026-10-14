@@ -8,6 +8,7 @@ export default defineConfig({
   redirects: {
     '/research': '/#research',
     '/projects': '/#research',
+    '/cv': '/',
   },
   vite: {
     plugins: [tailwindcss()],
