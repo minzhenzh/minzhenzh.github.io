@@ -9,6 +9,8 @@ interface Props {
 
 const { title, description = 'Personal website of Minzhen Zhang.' } = Astro.props;
 const fullTitle = title === 'Home' ? 'Minzhen Zhang' : `${title} · Minzhen Zhang`;
+// A page with a hero renders the header inside it.
+const hasHero = Astro.slots.has('hero');
 ---
 
 <!doctype html>
@@ -29,10 +31,21 @@ const fullTitle = title === 'Home' ? 'Minzhen Zhang' : `${title} · Minzhen Zhan
     </script>
   </head>
   <body class="flex min-h-screen flex-col antialiased">
-    <div class="mx-auto w-full max-w-page px-6 sm:px-8 lg:px-12">
-      <Nav />
-    </div>
-    <main class="mx-auto w-full max-w-page flex-1 px-6 pt-16 pb-24 text-lg leading-normal sm:px-8 lg:px-12 sm:pt-20 sm:text-xl">
+    {
+      hasHero ? (
+        <slot name="hero" />
+      ) : (
+        <div class="mx-auto w-full max-w-page px-6 sm:px-8 lg:px-12">
+          <Nav />
+        </div>
+      )
+    }
+    <main
+      class:list={[
+        'mx-auto w-full max-w-page flex-1 px-6 pb-24 text-lg leading-normal sm:px-8 sm:text-xl lg:px-12',
+        hasHero ? 'pt-6' : 'pt-16 sm:pt-20',
+      ]}
+    >
       <slot />
     </main>
     <footer class="mx-auto w-full max-w-page px-6 pb-8 font-sans text-[13px] text-muted sm:px-8 lg:px-12">

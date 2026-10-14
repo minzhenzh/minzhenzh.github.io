@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Heading from '../components/Heading.astro';
+import NightHero from '../components/NightHero.astro';
 import Placeholder from '../components/Placeholder.astro';
 import WorkCard from '../components/WorkCard.astro';
 import { getWork } from '../lib/content';
@@ -9,16 +10,16 @@ const work = await getWork();
 ---
 
 <BaseLayout title="Home">
-  <div class="space-y-6">
-    <div class="max-w-text space-y-6">
-      <p class="font-medium">
-        I’m an M.Sc. student in Computer Science at the University of Guelph, under the supervision of <a href="http://socs.uoguelph.ca/~lliao01/" class="prose-link">Lizhi Liao</a>.
-      </p>
-      <p>
-        I’m interested in AI agents, software engineering, computer graphics, and game development, particularly in building virtual worlds and characters, and in understanding how people play and interact within them.
-      </p>
-    </div>
+  <NightHero slot="hero">
+    <p class="font-medium">
+      I’m an M.Sc. student in Computer Science at the University of Guelph, under the supervision of <a href="http://socs.uoguelph.ca/~lliao01/" class="prose-link">Lizhi Liao</a>.
+    </p>
+    <p>
+      I’m interested in AI agents, software engineering, computer graphics, and game development, particularly in building virtual worlds and characters, and in understanding how people play and interact within them.
+    </p>
+  </NightHero>
 
+  <div class="space-y-6">
     {/* News: uncomment once there is something to announce.
     <Heading>News</Heading>
     <ul class="space-y-3">
