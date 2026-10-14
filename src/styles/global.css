@@ -76,8 +76,10 @@
 
   --font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
 
-  /* Page column width (incl. side padding): ~65-70 characters per line at body size. */
-  --container-page: 44rem;
+  /* Page width: nearly full width, capped so ultra-wide screens keep a margin. */
+  --container-page: 90rem;
+  /* Running text stays ~65-70 characters per line at body size. */
+  --container-text: 40rem;
 }
 
 body {
