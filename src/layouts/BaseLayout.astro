@@ -1,0 +1,33 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Personal website of Minzhen Zhang.' } = Astro.props;
+const fullTitle = title === 'Home' ? 'Minzhen Zhang' : `${title} · Minzhen Zhang`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <title>{fullTitle}</title>
+  </head>
+  <body class="flex min-h-screen flex-col font-sans antialiased">
+    <Nav />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <footer class="border-t border-border py-6 text-center text-sm text-muted">
+      © {new Date().getFullYear()} Minzhen Zhang
+    </footer>
+  </body>
+</html>

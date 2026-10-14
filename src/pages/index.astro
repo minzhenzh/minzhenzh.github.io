@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Placeholder from '../components/Placeholder.astro';
+---
+
+<BaseLayout title="Home">
+  <section class="bg-hero-bg text-hero-fg">
+    <div class="mx-auto max-w-4xl px-4 py-20 sm:py-28">
+      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Minzhen Zhang</h1>
+      <p class="mt-4 max-w-2xl text-lg text-hero-muted">TODO: one-line introduction</p>
+      <div class="mt-8 flex flex-wrap gap-3 text-sm">
+        <a href="/research/" class="rounded-md bg-hero-fg px-4 py-2 font-medium text-hero-bg hover:opacity-90">
+          Research
+        </a>
+        <a href="/projects/" class="rounded-md border border-hero-muted px-4 py-2 font-medium hover:bg-hero-fg/10">
+          Projects
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-4xl space-y-6 px-4 py-12 sm:py-16">
+    <h2 class="text-2xl font-semibold tracking-tight">About</h2>
+    <Placeholder label="short bio" />
+    <h2 class="text-2xl font-semibold tracking-tight">News</h2>
+    <Placeholder label="recent updates" />
+  </section>
+</BaseLayout>

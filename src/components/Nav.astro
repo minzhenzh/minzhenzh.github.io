@@ -1,0 +1,35 @@
+---
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/research/', label: 'Research' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/cv/', label: 'CV' },
+];
+
+const normalize = (p: string) => (p.endsWith('/') ? p : `${p}/`);
+const current = normalize(Astro.url.pathname);
+---
+
+<header class="border-b border-border bg-bg/80 backdrop-blur">
+  <nav class="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-4">
+    <a href="/" class="font-semibold tracking-tight">Minzhen Zhang</a>
+    <ul class="flex gap-4 text-sm sm:gap-6">
+      {
+        links.map(({ href, label }) => (
+          <li>
+            <a
+              href={href}
+              aria-current={current === href ? 'page' : undefined}
+              class:list={[
+                'transition-colors hover:text-accent',
+                current === href ? 'text-accent' : 'text-muted',
+              ]}
+            >
+              {label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>

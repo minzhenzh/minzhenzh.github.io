@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* Design tokens. Light by default; dark follows the system setting. */
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --fg: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #2563eb;
+
+  /* Hero stays dark in both modes. */
+  --hero-bg: #0b1120;
+  --hero-fg: #f8fafc;
+  --hero-muted: #94a3b8;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --surface: #111c33;
+    --fg: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #1e293b;
+    --accent: #60a5fa;
+
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-hero-bg: var(--hero-bg);
+  --color-hero-fg: var(--hero-fg);
+  --color-hero-muted: var(--hero-muted);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
