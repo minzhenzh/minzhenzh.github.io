@@ -16,3 +16,6 @@ npm-debug.log*
 
 # macOS
 .DS_Store
+
+# Claude desktop app (local preview config)
+.claude/
