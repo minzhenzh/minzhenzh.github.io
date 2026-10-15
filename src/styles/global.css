@@ -313,6 +313,13 @@ button.contact-icon:hover,
   animation: draw 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.5s both;
 }
 
+/* The other sections get a thin graphite pencil line instead of a highlighter. */
+.marker-stroke-pencil {
+  stroke: var(--sketch);
+  stroke-width: 1.5px;
+  translate: 0 3px;
+}
+
 @keyframes draw {
   from {
     stroke-dashoffset: 800;
@@ -442,6 +449,40 @@ button.contact-icon:hover,
 
 .prose code {
   font-size: 0.85em;
+}
+
+/* Code blocks (Shiki colors them inline); long lines scroll instead of wrapping. */
+.prose pre {
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  border-radius: 4px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.prose pre code {
+  font-size: inherit;
+}
+
+/* Videos in a <figure>, sized like Markdown figures, with a caption like theirs. */
+.prose figure {
+  margin-block: 2.5rem;
+}
+
+.prose video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--figure-bg);
+  filter: var(--figure-filter);
+}
+
+.prose figcaption {
+  margin-top: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 /* Figures sit on white, like paper, in both themes. They span the text width;

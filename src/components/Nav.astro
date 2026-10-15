@@ -2,8 +2,11 @@
 import HandwrittenName from './HandwrittenName.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
+// Research & Projects uses its pink pen on hover. Teaching is hidden on phones,
+// where the handwritten name leaves room for only one link.
 const links = [
-  { href: '/#research', label: 'Research & Projects' },
+  { href: '/#research', label: 'Research & Projects', pen: true },
+  { href: '/#teaching', label: 'Teaching', pen: false, wide: true },
 ];
 
 const normalize = (p: string) => (p.endsWith('/') ? p : `${p}/`);
@@ -18,14 +21,16 @@ const current = normalize(Astro.url.pathname);
     <nav>
       <ul class="flex gap-5 font-sans text-[13px]">
         {
-          links.map(({ href, label }) => (
-            <li>
+          links.map(({ href, label, pen, wide }) => (
+            <li class:list={[wide && 'hidden sm:block']}>
               <a
                 href={href}
                 aria-current={current === href ? 'page' : undefined}
                 class:list={[
-                  'marker-hover pen-pink whitespace-nowrap transition-colors hover:text-fg',
-                  current === href ? 'marker text-fg' : 'text-muted',
+                  'whitespace-nowrap transition-colors hover:text-fg',
+                  pen && 'marker-hover pen-pink',
+                  current === href ? 'text-fg' : 'text-muted',
+                  current === href && pen && 'marker',
                 ]}
               >
                 {label}

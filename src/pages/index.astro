@@ -9,6 +9,13 @@ import WorkCard from '../components/WorkCard.astro';
 import { getWork } from '../lib/content';
 
 const work = await getWork();
+
+// Teaching assistantships, newest first.
+const teaching = [
+  { code: 'CIS*3530', course: 'Database Systems & Concepts', term: 'Fall 2026', ongoing: true },
+  { code: 'CIS*3490', course: 'The Analysis and Design of Computer Algorithms', term: 'Winter 2026' },
+  { code: 'CIS*3190', course: 'Software for Legacy Systems', term: 'Winter 2026' },
+];
 ---
 
 <BaseLayout title="Home">
@@ -56,6 +63,24 @@ const work = await getWork();
           </div>
         )
       }
+    </section>
+
+    <section id="teaching" class="reveal scroll-mt-8 pt-12" style="--reveal: 5">
+      <Heading pen="pencil">Teaching</Heading>
+      <p class="mt-6 text-muted">Teaching assistant, University of Guelph</p>
+      <ul class="mt-4 max-w-text space-y-3">
+        {
+          teaching.map(({ code, course, term, ongoing }) => (
+            <li class="flex flex-wrap items-baseline justify-between gap-x-6">
+              <span>{course}</span>
+              <span class="font-sans text-[13px] tracking-wide text-muted uppercase">
+                {code} · {term}
+                {ongoing && ' · ongoing'}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
     </section>
   </div>
 </BaseLayout>
