@@ -191,11 +191,15 @@ solverMaterial.setUniform('uFieldParams', fieldParams.flat());
 
 Because `solverParams` is on `window`, you can play with the weather from the browser console while it runs. Here's the same snow with only gravity, next to all four fields:
 
-![Only a few snowflakes scattered across a dark blue sky](./webgl-snow-framebuffer-solver/snow-gravity-only.png)
-*Gravity only: `solverParams.vortexSwitcher = 0; solverParams.noiseSwitcher = 0; solverParams.dampSwitcher = 0`. Nothing slows the flakes down, so they rush through and only a few are on screen at once.*
+<figure>
+  <video src="/media/webgl-snow-framebuffer-solver/snow-gravity-only.mp4" autoplay muted loop playsinline></video>
+  <figcaption>Gravity only: <code>solverParams.vortexSwitcher = 0; solverParams.noiseSwitcher = 0; solverParams.dampSwitcher = 0</code>. Nothing slows the flakes down, so they speed up, rush through and only a few are on screen at once.</figcaption>
+</figure>
 
-![Many soft snowflakes spread across a dark blue sky](./webgl-snow-framebuffer-solver/snow.png)
-*All four fields on, the default. Damping keeps the flakes slow, so more of them hang in the air, and the vortex and noise give them a little wobble on the way down.*
+<figure>
+  <video src="/media/webgl-snow-framebuffer-solver/snow-all-fields.mp4" autoplay muted loop playsinline></video>
+  <figcaption>All four fields on, the default. Damping keeps the flakes slow, so more of them hang in the air, and the vortex and noise give them a little wobble on the way down.</figcaption>
+</figure>
 
 ## Drawing the flakes
 
