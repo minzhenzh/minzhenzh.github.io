@@ -5,6 +5,7 @@ label: "Blog · WebGL"
 year: 2024
 image: ./webgl-blast-texture-atlas/blast.png
 imageAlt: "A ring of glowing orange fire puffs on a grey background, rendered by the blast demo."
+video: /media/webgl-blast-texture-atlas/blast.mp4
 links:
   code: https://github.com/minzhenzh/webgl_engine/tree/webgl1
 ---
@@ -12,7 +13,7 @@ links:
 Blast is one of the small demos in our WebGL1 engine. It is a ring of fire puffs. Each puff grows, flickers through a little fire animation, fades out, and comes back.
 
 <figure>
-  <video src="/media/webgl-blast-texture-atlas/blast.mp4" autoplay muted loop playsinline></video>
+  <video src="/media/webgl-blast-texture-atlas/blast.mp4" poster="/media/webgl-blast-texture-atlas/blast.jpg" width="1280" height="720" preload="none" muted loop playsinline></video>
   <figcaption>The blast demo running in the browser.</figcaption>
 </figure>
 

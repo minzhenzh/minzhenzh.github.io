@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import AuthorList from './AuthorList.astro';
 import Meta from './Meta.astro';
 import LinkRow from './LinkRow.astro';
@@ -11,23 +11,42 @@ interface Props {
 }
 
 const { id } = Astro.props.entry;
-const { title, authors, label, year, image, imageAlt, links } = Astro.props.entry.data;
+const { title, authors, label, year, image, imageAlt, video, links } = Astro.props.entry.data;
 // The figure and title open the entry's project page.
 const href = `/work/${id}/`;
 // The frame's viewBox matches the figure's 16:10 aspect, so the wobble isn't stretched.
 const frame = sketchRect(id, 160, 100);
+// Demo entries show their video instead; the image is its poster until hovered.
+const poster = video && (await getImage({ src: image, width: Math.min(image.width, 1280) })).src;
+const figureClass = 'figure aspect-[16/10] w-full bg-figure object-contain p-2 transition-opacity group-hover:opacity-85';
 ---
 
 <li>
   <a href={href} class="group block">
     <div class="relative">
-      <Image
-        src={image}
-        alt={imageAlt}
-        widths={[480, 960, 1440]}
-        sizes="(min-width: 1440px) 680px, (min-width: 768px) 50vw, 100vw"
-        class="figure aspect-[16/10] w-full bg-figure object-contain p-2 transition-opacity group-hover:opacity-85"
-      />
+      {
+        video ? (
+          <video
+            src={video}
+            poster={poster}
+            preload="none"
+            muted
+            loop
+            playsinline
+            aria-label={imageAlt}
+            class={figureClass}
+            data-hover-video
+          />
+        ) : (
+          <Image
+            src={image}
+            alt={imageAlt}
+            widths={[480, 960, 1440]}
+            sizes="(min-width: 1440px) 680px, (min-width: 768px) 50vw, 100vw"
+            class={figureClass}
+          />
+        )
+      }
       <svg
         class="sketch-frame pointer-events-none absolute inset-0 h-full w-full overflow-visible"
         viewBox="0 0 160 100"
@@ -50,3 +69,26 @@ const frame = sketchRect(id, 160, 100);
     <LinkRow links={links} />
   </Meta>
 </li>
+
+<script>
+  // Card videos play only while the mouse (or keyboard focus) is on the card,
+  // then go back to the poster. Touch screens and reduced motion keep the poster.
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLVideoElement>('[data-hover-video]').forEach((video) => {
+    const card = video.closest('a')!;
+    const play = () => {
+      if (!reducedMotion.matches) video.play().catch(() => {});
+    };
+    const stop = () => {
+      video.pause();
+      video.load(); // back to the poster; the clip stays in the HTTP cache
+    };
+    card.addEventListener('pointerenter', (event) => {
+      if (event.pointerType !== 'touch') play();
+    });
+    card.addEventListener('pointerleave', stop);
+    card.addEventListener('focus', play);
+    card.addEventListener('blur', stop);
+  });
+</script>

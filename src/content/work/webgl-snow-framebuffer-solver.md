@@ -5,6 +5,7 @@ label: "Blog · WebGL"
 year: 2025
 image: ./webgl-snow-framebuffer-solver/snow.png
 imageAlt: "Soft round snowflakes drifting down a dark blue sky."
+video: /media/webgl-snow-framebuffer-solver/snow.mp4
 links:
   code: https://github.com/minzhenzh/webgl_engine/tree/webgl1
 ---
@@ -12,7 +13,7 @@ links:
 Snow is the default demo in our WebGL1 engine. On screen it's simple: snowflakes drift down from the sky, swirl a little and fall.
 
 <figure>
-  <video src="/media/webgl-snow-framebuffer-solver/snow.mp4" autoplay muted loop playsinline></video>
+  <video src="/media/webgl-snow-framebuffer-solver/snow.mp4" poster="/media/webgl-snow-framebuffer-solver/snow.jpg" width="960" height="720" preload="none" muted loop playsinline></video>
   <figcaption>A part of the snow demo. Every flake is updated on the GPU, every frame.</figcaption>
 </figure>
 
@@ -192,12 +193,12 @@ solverMaterial.setUniform('uFieldParams', fieldParams.flat());
 Because `solverParams` is on `window`, you can play with the weather from the browser console while it runs. Here's the same snow with only gravity, next to all four fields:
 
 <figure>
-  <video src="/media/webgl-snow-framebuffer-solver/snow-gravity-only.mp4" autoplay muted loop playsinline></video>
+  <video src="/media/webgl-snow-framebuffer-solver/snow-gravity-only.mp4" poster="/media/webgl-snow-framebuffer-solver/snow-gravity-only.jpg" width="960" height="720" preload="none" muted loop playsinline></video>
   <figcaption>Gravity only: <code>solverParams.vortexSwitcher = 0; solverParams.noiseSwitcher = 0; solverParams.dampSwitcher = 0</code>. Nothing slows the flakes down, so they speed up, rush through and only a few are on screen at once.</figcaption>
 </figure>
 
 <figure>
-  <video src="/media/webgl-snow-framebuffer-solver/snow-all-fields.mp4" autoplay muted loop playsinline></video>
+  <video src="/media/webgl-snow-framebuffer-solver/snow-all-fields.mp4" poster="/media/webgl-snow-framebuffer-solver/snow-all-fields.jpg" width="960" height="720" preload="none" muted loop playsinline></video>
   <figcaption>All four fields on, the default. Damping keeps the flakes slow, so more of them hang in the air, and the vortex and noise give them a little wobble on the way down.</figcaption>
 </figure>
 

@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { title, authors, summary, label, year, image, imageAlt, links, underReview } = entry.data;
+const { title, authors, summary, label, year, image, imageAlt, video, links, underReview } = entry.data;
 const { Content } = await render(entry);
 const { paper, ...otherLinks } = links;
 const frame = sketchRect(`${entry.id}-hero`, 160, 100);
@@ -51,20 +51,25 @@ const frame = sketchRect(`${entry.id}-hero`, 160, 100);
 
     {summary && <p class="reveal mt-10 text-xl leading-[1.35] tracking-[-0.01em] sm:text-2xl" style="--reveal: 2">{summary}</p>}
 
-    <div class="reveal relative mt-10" style="--reveal: 3">
-      <Image src={image} alt={imageAlt} widths={[800, 1600]} sizes="(min-width: 720px) 640px, 100vw" class="figure w-full bg-figure p-3" />
-      <svg
-        class="sketch-frame pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-        viewBox="0 0 160 100"
-        preserveAspectRatio="none"
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        {frame.map((d) => <path d={d} vector-effect="non-scaling-stroke" />)}
-      </svg>
-    </div>
+    {/* Demo entries skip the overview: the demo video sits at the top of their body. */}
+    {
+      !video && (
+        <div class="reveal relative mt-10" style="--reveal: 3">
+          <Image src={image} alt={imageAlt} widths={[800, 1600]} sizes="(min-width: 720px) 640px, 100vw" class="figure w-full bg-figure p-3" />
+          <svg
+            class="sketch-frame pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+            viewBox="0 0 160 100"
+            preserveAspectRatio="none"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            {frame.map((d) => <path d={d} vector-effect="non-scaling-stroke" />)}
+          </svg>
+        </div>
+      )
+    }
 
     <div class="prose reveal mt-12 text-lg leading-relaxed sm:text-xl" style="--reveal: 4">
       <Content />
@@ -103,4 +108,40 @@ const frame = sketchRect(`${entry.id}-hero`, 160, 100);
 
   // Escape closes the dialog natively; a click anywhere closes it too.
   dialog.addEventListener('click', () => dialog.close());
+
+  // Post videos are written with preload="none" and a poster, no autoplay, so
+  // nothing downloads up front. They play like GIFs only while on screen and
+  // the tab is visible; with reduced motion they stay on the poster with controls.
+  const videos = [...document.querySelectorAll<HTMLVideoElement>('.prose video')];
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const onScreen = new Set<HTMLVideoElement>();
+
+  const sync = (video: HTMLVideoElement) => {
+    video.controls = reducedMotion.matches;
+    if (reducedMotion.matches) return; // the reader starts it themselves
+    if (onScreen.has(video) && !document.hidden) {
+      video.play().catch(() => {}); // rejected if the browser blocks autoplay
+    } else {
+      video.pause();
+    }
+  };
+  const syncAll = () => videos.forEach(sync);
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const { target, isIntersecting } of entries) {
+        const video = target as HTMLVideoElement;
+        if (isIntersecting) onScreen.add(video);
+        else onScreen.delete(video);
+        sync(video);
+      }
+    },
+    { threshold: 0.25 },
+  );
+  videos.forEach((video) => observer.observe(video));
+  document.addEventListener('visibilitychange', syncAll);
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) videos.forEach((video) => video.pause());
+    syncAll();
+  });
 </script>

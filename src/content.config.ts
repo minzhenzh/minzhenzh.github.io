@@ -19,6 +19,10 @@ const work = defineCollection({
       year: z.number().int(),
       image: image(),
       imageAlt: z.string(),
+      // Demos: an MP4 under public/media/ shown on the home card instead of the
+      // image (which becomes its poster), playing while hovered. The project
+      // page then skips the overview figure; the body has the videos.
+      video: z.string().optional(),
       links: z
         .object({
           paper: z.url().optional(),
