@@ -132,7 +132,7 @@ posPixels.push(localX, localZ, size, startTime);
 The start times are spread over the duration, so flakes come out a few at a time instead of all at once. If you draw an emitter texture straight onto a quad you get this colorful mess, which is honestly just a picture of numbers:
 
 ![A diamond shaped quad covered in bright stripes of pink, cyan and blue](./webgl-snow-framebuffer-solver/emitter-texture.png)
-*An emitter texture drawn as color. Red and green are the spawn position, blue is size, alpha is start time.*
+*An emitter texture drawn as color, from the fire demo, which uses the same emitter. Red and green are the spawn position and blue is the size. The start time sits in alpha, so you can't see it here.*
 
 ## Born, live, repeat
 
@@ -194,11 +194,11 @@ solverMaterial.setUniform('uFieldParams', fieldParams.flat());
 
 Because `solverParams` is on `window`, you can play with the weather from the browser console while it runs. Here's the same snow with only gravity, next to all four fields:
 
-![Snowflakes falling in straight vertical lines](./webgl-snow-framebuffer-solver/snow-gravity-only.png)
-*Gravity only: `solverParams.vortexSwitcher = 0; solverParams.noiseSwitcher = 0; solverParams.dampSwitcher = 0`. Flakes fall like rain.*
+![A thin column of snowflakes falling from the emitter, sparse toward the bottom](./webgl-snow-framebuffer-solver/snow-gravity-only.png)
+*Gravity only: `solverParams.vortexSwitcher = 0; solverParams.noiseSwitcher = 0; solverParams.dampSwitcher = 0`. Nothing slows the flakes down, so they speed up and the column thins out.*
 
-![Snowflakes spread out and drifting in different directions](./webgl-snow-framebuffer-solver/snow.png)
-*All four fields on, the default. Vortex and noise spread the flakes out, and damping keeps them from speeding up too much.*
+![A dense column of snowflakes drifting down from the emitter](./webgl-snow-framebuffer-solver/snow.png)
+*All four fields on, the default. Damping keeps the flakes slow, so more of them hang in the air, and the vortex and noise give them a little wobble on the way down.*
 
 ## Drawing the flakes
 
