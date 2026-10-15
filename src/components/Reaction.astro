@@ -1,0 +1,67 @@
+---
+// A phrase that gets highlighted and pops a small hand-drawn icon at the pointer on
+// hover (tap on touch).
+// The bubble is positioned against the nearest [data-reactions] container, which
+// must be position: relative. Mouse and pen show it on hover; touch shows it on
+// tap and hides it on the next tap elsewhere.
+interface Props {
+  icon: keyof typeof icons;
+}
+
+const icons = {
+  robot: [
+    'M5.3 8.3C5.1 7.2 5.9 6.6 7 6.6L17.2 6.4C18.4 6.4 19 7.1 19 8.2L18.8 17.1C18.8 18.2 18.1 18.9 17 18.9L7.1 19.1C6 19.1 5.3 18.3 5.3 17.2L5.2 9.2',
+    'M9.4 11.5l.1 1.7M14.6 11.4l-.1 1.8M9.6 15.5c1.6.8 3.4.8 4.9-.1',
+    'M12.1 6.5L12 4.1M12 3.3a1 1 0 1 0 .1 0',
+    'M5.2 11.2l-1.6.1.1 2.9 1.5-.1M18.9 11.1l1.6-.1.1 3-1.6.1',
+  ],
+  code: ['M8.6 6.4C6.9 8.3 5.2 10.2 3.4 12.2C5.2 14 7 15.8 8.8 17.6', 'M15.3 6.6C17.1 8.4 18.8 10.2 20.6 12C18.8 13.8 17 15.6 15.1 17.4', 'M13.8 4.6C12.6 9.6 11.4 14.5 10.2 19.5'],
+  cube: ['M4.6 9.1L14.3 9.3L14.1 19.6L4.4 19.4L4.7 8.6', 'M4.6 9.1L9.6 4.4L19.5 4.6L19.3 14.7L14.1 19.6', 'M14.3 9.3L19.6 4.5'],
+  gamepad: [
+    'M7.2 8.2C9.8 7.6 14.4 7.5 16.9 8.1C19.8 8.8 21.6 13.6 21.2 16.8C20.9 18.9 19 19.4 17.7 18L15.6 15.8C13.4 15.3 10.6 15.3 8.5 15.8L6.3 18C5 19.3 3.1 18.8 2.9 16.6C2.6 13.4 4.4 8.8 7.4 8.1',
+    'M7.6 10.4l.1 3M6.1 11.9l3.1-.1',
+    'M16.2 10.8h.1M17.9 12.8h.1',
+  ],
+  planet: [
+    'M16.4 8C14.6 5.6 10.7 5.2 8.3 7.2C5.8 9.3 5.6 13.6 7.8 16C10 18.4 14.2 18.6 16.4 16.3C18.4 14.2 18.4 10.4 16.4 7.7',
+    'M5.6 12.6C2.4 14.6 1.6 16.6 3 17.4C5 18.6 11.4 16.4 16.6 13C21.2 10 22.8 7.4 21.2 6.6C20 6 17.8 6.8 16 7.8',
+    'M19.6 18.2l.1 2.4M18.4 19.4l2.4-.1',
+  ],
+} as const;
+
+const { icon } = Astro.props;
+---
+
+<span class="reaction-term marker-hover pen-yellow" data-reaction><slot /><span class="reaction-anchor" aria-hidden="true"><span class="reaction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{icons[icon].map((d) => <path d={d} />)}</svg></span></span></span>
+
+<script>
+  const terms = document.querySelectorAll<HTMLElement>('[data-reaction]');
+
+  const show = (term: HTMLElement, event: PointerEvent) => {
+    const box = term.closest('[data-reactions]')?.getBoundingClientRect();
+    if (!box) return;
+    term.style.setProperty('--reaction-x', `${event.clientX - box.left}px`);
+    term.style.setProperty('--reaction-y', `${event.clientY - box.top}px`);
+    term.classList.add('is-active');
+  };
+
+  const hideAll = () => terms.forEach((term) => term.classList.remove('is-active'));
+
+  terms.forEach((term) => {
+    term.addEventListener('pointerenter', (event) => {
+      if (event.pointerType !== 'touch') show(term, event);
+    });
+    term.addEventListener('pointerleave', (event) => {
+      if (event.pointerType !== 'touch') term.classList.remove('is-active');
+    });
+    term.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'touch') return;
+      hideAll();
+      show(term, event);
+    });
+  });
+
+  document.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'touch' && !(event.target as Element).closest('[data-reaction]')) hideAll();
+  });
+</script>

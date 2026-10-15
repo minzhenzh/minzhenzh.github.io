@@ -1,0 +1,118 @@
+---
+// Contact logos under the intro. The envelope opens a small panel with both
+// email addresses on hover, keyboard focus, or tap. A profile without an href
+// shows greyed out and unlinked until there is something to link to.
+import { sketchRect } from '../lib/sketch';
+
+interface Props {
+  class?: string;
+  style?: string;
+}
+
+const emails = ['mzhang26@uoguelph.ca', 'minzhenzh@gmail.com'];
+
+const profiles: { label: string; href?: string; icon: Exclude<keyof typeof icons, 'mail'> }[] = [
+  { label: 'GitHub', href: 'https://github.com/minzhenzh', icon: 'github' },
+  { label: 'Google Scholar', icon: 'scholar' }, // TODO: profile link
+  { label: 'X', icon: 'x' }, // TODO: profile link
+  { label: 'LinkedIn', icon: 'linkedin' }, // TODO: profile link
+];
+
+// Brand marks are filled 24×24 paths; the envelope is a hand-drawn stroke.
+const icons = {
+  mail: { stroke: ['M3.4 6.6C8.9 6.2 15 6.1 20.6 6.5C20.9 10.2 20.8 14 20.4 17.6C14.9 18 9.1 18 3.6 17.5C3.2 13.9 3.1 10.2 3.4 6.4', 'M3.6 6.9C6.5 9.3 9.3 11.4 12.1 13C14.9 11.3 17.7 9.2 20.4 6.8'] },
+  github: {
+    fill: 'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12',
+  },
+  scholar: { fill: 'M5.242 13.769 0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z' },
+  x: { fill: 'M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z' },
+  linkedin: {
+    fill: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.913 1.637-1.84 3.37-1.84 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
+  },
+} as const;
+
+// The email panel gets a pencil frame like the work figures (viewBox ≈ its aspect).
+const frame = sketchRect('emails', 120, 44, 0.9);
+
+const { class: className, style } = Astro.props;
+---
+
+{/* relative z-10: the .reveal animation makes later sections stack above, so lift the row for the panel. */}
+<ul class:list={['relative z-10 flex flex-wrap items-center gap-x-5 gap-y-3', className]} style={style}>
+  <li class="email-menu relative" data-email-menu>
+    <button type="button" class="contact-icon" aria-label="Email" aria-expanded="false" aria-controls="email-panel" title="Email">
+      <svg class="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {icons.mail.stroke.map((d) => <path d={d} />)}
+      </svg>
+    </button>
+    {/* pt-2 bridges the gap so the pointer can move from the icon into the panel. */}
+    <div id="email-panel" class="email-panel absolute top-full -left-3 z-20 pt-2">
+      <div class="relative bg-bg px-4 py-3">
+        <svg
+          class="pointer-events-none absolute inset-0 h-full w-full overflow-visible text-sketch"
+          viewBox="0 0 120 44"
+          preserveAspectRatio="none"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          {frame.map((d) => <path d={d} stroke-width="1.25" vector-effect="non-scaling-stroke" />)}
+        </svg>
+        <ul class="relative space-y-1.5 font-sans text-[14px] leading-5 whitespace-nowrap">
+          {
+            emails.map((email) => (
+              <li>
+                <a href={`mailto:${email}`} class="prose-link text-muted transition-colors hover:text-fg">
+                  {email}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </li>
+  {
+    profiles.map(({ label, href, icon }) => {
+      const Tag = href ? 'a' : 'span';
+      return (
+        <li>
+          <Tag
+            href={href}
+            class:list={['contact-icon', !href && 'is-empty']}
+            aria-label={label}
+            role={href ? undefined : 'img'}
+            title={label}
+          >
+            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d={icons[icon].fill} />
+            </svg>
+          </Tag>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<script>
+  // Hover and focus open the panel in CSS; a click (or tap, where there is no
+  // hover) pins it open until a click elsewhere or Escape.
+  document.querySelectorAll<HTMLElement>('[data-email-menu]').forEach((menu) => {
+    const button = menu.querySelector('button')!;
+    const set = (open: boolean) => {
+      menu.classList.toggle('is-open', open);
+      button.setAttribute('aria-expanded', String(open));
+    };
+    button.addEventListener('click', () => set(!menu.classList.contains('is-open')));
+    document.addEventListener('click', (event) => {
+      if (!menu.contains(event.target as Node)) set(false);
+    });
+    menu.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        set(false);
+        (document.activeElement as HTMLElement | null)?.blur();
+      }
+    });
+  });
+</script>

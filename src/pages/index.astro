@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Contacts from '../components/Contacts.astro';
 import Heading from '../components/Heading.astro';
+import InkTree from '../components/InkTree.astro';
 import Placeholder from '../components/Placeholder.astro';
+import Reaction from '../components/Reaction.astro';
 import WorkCard from '../components/WorkCard.astro';
 import { getWork } from '../lib/content';
 
@@ -10,13 +13,22 @@ const work = await getWork();
 
 <BaseLayout title="Home">
   <div class="space-y-6">
-    <div class="max-w-text space-y-6">
-      <p class="font-medium">
-        I’m an M.Sc. student in Computer Science at the University of Guelph, under the supervision of <a href="http://socs.uoguelph.ca/~lliao01/" class="prose-link">Lizhi Liao</a>.
-      </p>
-      <p>
-        I’m interested in AI agents, software engineering, computer graphics, and game development, particularly in building virtual worlds and characters, and in understanding how people play and interact within them.
-      </p>
+    {/* The intro gets the whole first screen (minus the header), so the work
+        grid starts below the fold instead of competing with the intro. */}
+    <div class="min-h-[calc(100svh-11rem)]">
+      <div class="relative">
+        <div class="max-w-text space-y-8 text-xl leading-[1.3] tracking-[-0.01em] lg:text-2xl">
+          <p class="reveal font-medium" style="--reveal: 1">
+            I’m an M.Sc. student in Computer Science at the University of Guelph, under the supervision of Professor <a href="http://socs.uoguelph.ca/~lliao01/" class="prose-link">Lizhi Liao</a>.
+          </p>
+          <p class="reveal relative" style="--reveal: 2" data-reactions>
+            I’m interested in <Reaction icon="robot">AI agents</Reaction>, <Reaction icon="code">software engineering</Reaction>, <Reaction icon="cube">computer graphics</Reaction>, and <Reaction icon="gamepad">game development</Reaction>, particularly in <Reaction icon="planet">building virtual worlds and characters</Reaction>, and in understanding how people play and interact within them.
+          </p>
+          <Contacts class="reveal" style="--reveal: 3" />
+        </div>
+        {/* Fills the empty space beside the intro on wide screens. */}
+        <InkTree class="pointer-events-none absolute -top-16 right-[6%] hidden h-[calc(100%+7.5rem)] w-auto xl:block" />
+      </div>
     </div>
 
     {/* News: uncomment once there is something to announce.
@@ -29,11 +41,11 @@ const work = await getWork();
     </ul>
     */}
 
-    <section id="research" class="scroll-mt-8">
+    <section id="research" class="reveal scroll-mt-8" style="--reveal: 4">
       <Heading>Research &amp; Projects</Heading>
       {
         work.length > 0 ? (
-          <ul class="mt-6 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <ul class="mt-6 grid gap-x-10 gap-y-14 md:grid-cols-2">
             {work.map((entry) => (
               <WorkCard entry={entry} />
             ))}

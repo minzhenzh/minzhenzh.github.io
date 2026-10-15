@@ -1,4 +1,5 @@
 ---
+import HandwrittenName from './HandwrittenName.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 const links = [
@@ -9,9 +10,11 @@ const normalize = (p: string) => (p.endsWith('/') ? p : `${p}/`);
 const current = normalize(Astro.url.pathname);
 ---
 
-<header class="flex items-baseline justify-between gap-6 pt-8">
-  <a href="/" class="text-lg" aria-current={current === '/' ? 'page' : undefined}>Minzhen Zhang</a>
-  <div class="flex items-center gap-5">
+<header class="reveal flex items-center justify-between gap-3 pt-8 sm:gap-6" style="--reveal: 0">
+  <a href="/" class="-my-1 block shrink-0" aria-current={current === '/' ? 'page' : undefined}>
+    <HandwrittenName class="h-[22px] sm:h-8" />
+  </a>
+  <div class="flex items-center gap-3 sm:gap-5">
     <nav>
       <ul class="flex gap-5 font-sans text-[13px]">
         {
@@ -21,8 +24,8 @@ const current = normalize(Astro.url.pathname);
                 href={href}
                 aria-current={current === href ? 'page' : undefined}
                 class:list={[
-                  'transition-colors hover:text-fg',
-                  current === href ? 'text-fg underline decoration-highlight decoration-4 underline-offset-[-1px]' : 'text-muted',
+                  'marker-hover pen-pink whitespace-nowrap transition-colors hover:text-fg',
+                  current === href ? 'marker text-fg' : 'text-muted',
                 ]}
               >
                 {label}

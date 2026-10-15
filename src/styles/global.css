@@ -9,7 +9,13 @@
   --fg: #1f2322;
   --muted: #6b6f6e;
   --rule: #d9d9d6;
-  --highlight: #e8dccf;
+  --sketch: #9c9e9b;
+  /* Highlighter pens: yellow for the intro, pink for Research & Projects.
+     Drawn semi-transparent (see .marker), so text stays readable. */
+  --marker-yellow: #ffe81a;
+  --marker-pink: #ffa0d0;
+  /* Behind figures shown with object-contain; figures are drawn on white. */
+  --figure-bg: #ffffff;
   --figure-filter: none;
 
   color-scheme: light;
@@ -21,7 +27,9 @@
     --fg: #e6e4df;
     --muted: #9a9b97;
     --rule: #3a3c3a;
-    --highlight: #4a4136;
+    --sketch: #6e706d;
+    --marker-yellow: #a08c00;
+    --marker-pink: #7e2e58;
     --figure-filter: brightness(0.85);
 
     color-scheme: dark;
@@ -33,7 +41,9 @@
   --fg: #e6e4df;
   --muted: #9a9b97;
   --rule: #3a3c3a;
-  --highlight: #4a4136;
+  --sketch: #6e706d;
+  --marker-yellow: #a08c00;
+  --marker-pink: #7e2e58;
   --figure-filter: brightness(0.85);
 
   color-scheme: dark;
@@ -72,7 +82,10 @@
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-rule: var(--rule);
-  --color-highlight: var(--highlight);
+  --color-sketch: var(--sketch);
+  --color-figure: var(--figure-bg);
+  --color-marker-yellow: var(--marker-yellow);
+  --color-marker-pink: var(--marker-pink);
 
   --font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
 
@@ -88,6 +101,277 @@ body {
   font-family: var(--font-serif);
 }
 
+::selection {
+  background: color-mix(in srgb, var(--marker-yellow) 70%, transparent);
+  color: var(--fg);
+}
+
+/* ---- Hand-drawn accents ---- */
+
+/* Bouncy ease for things that pop in. */
+:root {
+  --ease-pop: linear(0, 0.1, 0.32, 0.56, 0.76, 0.91, 1.01, 1.07, 1.09, 1.08, 1.06, 1.04, 1.02, 1.01, 1, 0.995, 0.995, 1);
+}
+
+/* Page sections fade up one after another on load; set --reveal to the order. */
+.reveal {
+  animation: reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal, 0) * 90ms) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+/* Handwritten name: wiped in left to right, like it's being written. */
+.handwritten svg {
+  animation: write 1.1s cubic-bezier(0.45, 0.05, 0.4, 1) 0.15s both;
+}
+
+@keyframes write {
+  from {
+    clip-path: inset(-20% 100% -20% 0);
+  }
+  to {
+    clip-path: inset(-20% -2% -20% 0);
+  }
+}
+
+/* Highlighter pen. Ink is uneven (heavier at the start, pooled at the end) and
+   the stroke sits a little low, like a quick swipe. Set --marker to pick a pen.
+   .marker is always on; .marker-hover swipes in on hover or when .is-active. */
+.marker,
+.marker-hover,
+.prose h2 {
+  --marker: var(--marker-yellow);
+  margin-inline: -0.2em;
+  padding-inline: 0.2em;
+  border-radius: 0.5em 0.2em 0.6em 0.25em / 0.3em 0.6em 0.25em 0.5em;
+  background-image: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--marker) 30%, transparent),
+    color-mix(in srgb, var(--marker) 80%, transparent) 0.4em,
+    color-mix(in srgb, var(--marker) 62%, transparent) 60%,
+    color-mix(in srgb, var(--marker) 78%, transparent) calc(100% - 0.4em),
+    color-mix(in srgb, var(--marker) 25%, transparent)
+  );
+  background-repeat: no-repeat;
+  background-position: 0 85%;
+  background-size: 100% var(--marker-band, 70%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.marker-hover {
+  background-size: 0% var(--marker-band, 70%);
+  transition: background-size 0.35s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.marker-hover:hover,
+.marker-hover.is-active,
+.group:hover .marker-hover {
+  background-size: 100% var(--marker-band, 70%);
+}
+
+/* A lower, thinner swipe under the letters, for text that must stay easy to
+   read (work titles). */
+.marker-low {
+  --marker-band: 42%;
+}
+
+.pen-yellow { --marker: var(--marker-yellow); }
+.pen-pink { --marker: var(--marker-pink); }
+
+/* Reactions: a faint underline; on hover the phrase gets highlighted and a
+   doodle pops at the pointer on a blob of the same pen. */
+.reaction-term {
+  text-decoration: underline 1px color-mix(in srgb, var(--fg) 25%, transparent);
+  text-underline-offset: calc(0.1em + 1px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reaction-anchor {
+  position: absolute;
+  left: var(--reaction-x, 0);
+  top: var(--reaction-y, 0);
+}
+
+.reaction {
+  position: absolute;
+  bottom: 8px;
+  left: 6px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 36px;
+  border-radius: 58% 42% 55% 45% / 48% 60% 40% 52%;
+  background: color-mix(in srgb, var(--marker) 85%, transparent);
+  color: var(--fg);
+  pointer-events: none;
+  opacity: 0;
+  scale: 0;
+  rotate: -8deg;
+  transform-origin: 0 100%;
+  transition:
+    scale 0.15s,
+    opacity 0.15s;
+}
+
+.reaction svg {
+  width: 22px;
+  height: 22px;
+  rotate: 8deg;
+}
+
+.reaction-term.is-active .reaction {
+  opacity: 1;
+  scale: 1;
+  transition:
+    scale 0.5s var(--ease-pop),
+    opacity 0.1s;
+}
+
+/* Contacts: logos only; the envelope's panel opens on hover, focus or click. */
+.contact-icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem;
+  color: var(--muted);
+  transition: color 150ms;
+}
+
+a.contact-icon:hover,
+button.contact-icon:hover,
+.email-menu.is-open .contact-icon {
+  color: var(--fg);
+}
+
+.contact-icon.is-empty {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.email-panel {
+  visibility: hidden;
+  opacity: 0;
+  translate: 0 -4px;
+  transition:
+    opacity 150ms,
+    translate 150ms,
+    visibility 0s 150ms;
+}
+
+/* Keyboard focus opens it, but a mouse click only toggles .is-open (the button
+   keeps focus after a click, which would otherwise hold the panel open). */
+.email-menu:has(:focus-visible) .email-panel,
+.email-menu.is-open .email-panel {
+  visibility: visible;
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 150ms,
+    translate 150ms;
+}
+
+/* Touch screens keep :hover after a tap, so only real hover opens on hover. */
+@media (hover: hover) {
+  .email-menu:hover .email-panel {
+    visibility: visible;
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 150ms,
+      translate 150ms;
+  }
+}
+
+/* Work figures: a pencil-sketched frame instead of a ruled border. */
+.sketch-frame {
+  color: var(--sketch);
+  stroke-width: 1.25px;
+  transition: color 150ms;
+}
+
+.group:hover .sketch-frame {
+  color: var(--fg);
+}
+
+/* Section labels: a pink marker stroke that draws itself in (pink is the
+   Research & Projects pen; yellow is for the intro). */
+.marker-stroke {
+  width: calc(100% + 0.5rem);
+  stroke: color-mix(in srgb, var(--marker-pink) 70%, transparent);
+  stroke-width: 9px;
+  stroke-linecap: round;
+  /* In screen px (non-scaling stroke); longer than any label. */
+  stroke-dasharray: 800;
+  animation: draw 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.5s both;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 800;
+  }
+}
+
+/* Ink tree: each stroke grows in after the one it branches from. */
+.ink-tree path {
+  stroke-dasharray: 1;
+  animation: draw-in var(--dur, 0.4s) linear calc(0.4s + var(--at, 0s)) both;
+}
+
+.ink-tree .ink-specks {
+  stroke-dasharray: none;
+  animation: reveal-fade 1.2s ease-out calc(0.4s + var(--at, 0s)) both;
+}
+
+@keyframes draw-in {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: reveal-fade 0.3s both;
+  }
+
+  .handwritten svg,
+  .marker-stroke,
+  .ink-tree path {
+    animation: none;
+  }
+
+  .ink-tree .ink-specks {
+    animation: none;
+  }
+
+  .marker-hover {
+    transition: none;
+  }
+
+  .email-panel {
+    translate: none;
+  }
+
+  .reaction,
+  .reaction-term.is-active .reaction {
+    scale: 1;
+    transition: opacity 0.15s;
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 /* Prose links: thin, light underline that darkens on hover. */
 .prose-link {
   text-decoration-line: underline;
@@ -101,18 +385,38 @@ body {
   text-decoration-color: var(--fg);
 }
 
-/* Markdown bodies (project pages). */
+/* Markdown bodies (project pages). Text and figures share one reading width. */
 .prose > * + * {
   margin-top: 1em;
 }
 
+.prose > * {
+  max-width: var(--container-text);
+}
+
+.prose > p:has(> img) {
+  margin-block: 2.5rem;
+}
+
+/* Section labels: small caps on a low pink swipe (the Research & Projects pen). */
 .prose h2 {
-  margin-top: 2em;
+  --marker: var(--marker-pink);
+  --marker-band: 42%;
+  display: table;
+  margin-top: 2.75em;
   font-family: var(--font-sans);
   font-size: 13px;
   letter-spacing: 0.025em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+.prose h2 + * {
+  margin-top: 0.75em;
+}
+
+.prose strong {
+  font-weight: 600;
 }
 
 .prose ul {
@@ -140,6 +444,62 @@ body {
   font-size: 0.85em;
 }
 
+/* Figures sit on white, like paper, in both themes. They span the text width;
+   tall ones are capped so they don't tower over the text. */
 .prose img {
-  border-radius: 4px;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 32rem;
+  padding: 0.75rem;
+  background: var(--figure-bg);
+  filter: var(--figure-filter);
+}
+
+/* Project-page figures open full screen on click (see work/[id].astro). */
+.zoomable {
+  cursor: zoom-in;
+}
+
+.figure-zoom {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 1.5rem;
+  border: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+
+.figure-zoom[open] {
+  display: grid;
+  place-items: center;
+  animation: reveal-fade 150ms ease-out;
+}
+
+.figure-zoom::backdrop {
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+}
+
+.figure-zoom img {
+  max-width: calc(100vw - 3rem);
+  max-height: calc(100dvh - 3rem);
+  padding: 1rem;
+  background: var(--figure-bg);
+  filter: var(--figure-filter);
+}
+
+/* An *emphasized* line right after a figure, in the same paragraph, is its caption. */
+.prose p:has(> img) em {
+  display: block;
+  max-width: var(--container-text);
+  margin-top: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.5;
+  color: var(--muted);
 }

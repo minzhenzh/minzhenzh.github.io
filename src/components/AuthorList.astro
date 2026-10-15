@@ -1,0 +1,21 @@
+---
+// Comma-separated author list with Minzhen's own name in full ink.
+interface Props {
+  authors: string[];
+  class?: string;
+}
+
+const SELF = 'Minzhen Zhang';
+const { authors, class: className } = Astro.props;
+---
+
+<p class:list={['leading-snug text-muted', className]}>
+  {
+    authors.map((name, i) => (
+      <>
+        <span class:list={[name === SELF && 'text-fg']}>{name}</span>
+        {i < authors.length - 1 && ', '}
+      </>
+    ))
+  }
+</p>

@@ -1,0 +1,27 @@
+---
+// Decorative pen-and-ink tree (see src/lib/tree.ts). Strokes use currentColor, so
+// it follows the theme; it grows in on load (.ink-tree in global.css).
+import { inkTree } from '../lib/tree';
+
+interface Props {
+  seed?: string;
+  class?: string;
+}
+
+const { seed = 'minzhen', class: className } = Astro.props;
+const tree = inkTree(seed);
+const s = (n: number) => `${n.toFixed(2)}s`;
+---
+
+<svg
+  class:list={['ink-tree', className]}
+  viewBox={tree.viewBox}
+  fill="none"
+  stroke="currentColor"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  {tree.strokes.map(({ d, width, at, dur }) => <path d={d} pathLength="1" stroke-width={width} style={`--at:${s(at)};--dur:${s(dur)}`} />)}
+  <path class="ink-specks" d={tree.specks} stroke-width="1.2" style={`--at:${s(tree.specksAt)}`} />
+</svg>
