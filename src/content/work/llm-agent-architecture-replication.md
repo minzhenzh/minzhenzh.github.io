@@ -13,6 +13,8 @@ year: 2026
 image: ./llm-agent-architecture-replication/study-overview.png
 imageAlt: "Study overview: a configuration space of three benchmarks, seven models, five agent architectures, model composition and inference backend; ten repeated runs per configuration; and analyses at three replication levels (RQ1–RQ5)."
 underReview: true
+# Not public yet: waiting on the supervisor's OK to share before acceptance.
+hidden: true
 ---
 
 Multi-agent setups are an increasingly common way to build LLM-powered agents: several agents work in parallel, debate, or report to an orchestrator that splits up the task. Choosing among these setups is an architectural decision, with consequences for cost, latency and reliability. But unlike traditional software architecture, there is little established knowledge for reasoning about these trade-offs before deployment.
