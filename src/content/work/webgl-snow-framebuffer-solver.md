@@ -1,19 +1,19 @@
 ---
 title: "Snow: A Particle Solver Made of Framebuffers"
-summary: "WebGL1 has no compute shaders, so we taught a fragment shader to run a particle simulation. This is how our snow demo keeps a thousand flakes alive on the GPU."
+summary: "WebGL1 has no compute shaders, so we taught a fragment shader to run a particle simulation. This is how our snow demo keeps every flake alive on the GPU."
 label: "Blog · WebGL"
 year: 2025
 image: ./webgl-snow-framebuffer-solver/snow.png
-imageAlt: "Chunky white pixel snowflakes falling against a dark blue gradient sky."
+imageAlt: "Soft round snowflakes drifting down a dark blue sky."
 links:
   code: https://github.com/minzhenzh/webgl_engine/tree/webgl1
 ---
 
-Snow is the default demo in our WebGL1 engine. On screen it's simple: a patch of sky drops a thousand chunky snowflakes that drift, swirl a little and fall.
+Snow is the default demo in our WebGL1 engine. On screen it's simple: snowflakes drift down from the sky, swirl a little and fall.
 
 <figure>
   <video src="/media/webgl-snow-framebuffer-solver/snow.mp4" autoplay muted loop playsinline></video>
-  <figcaption>The snow demo. Every flake is updated on the GPU, every frame.</figcaption>
+  <figcaption>A part of the snow demo. Every flake is updated on the GPU, every frame.</figcaption>
 </figure>
 
 Under the hood it's a small physics solver that runs entirely inside a fragment shader. This post walks through how we built it.
@@ -91,7 +91,7 @@ Today every flake has four slots:
 
 ## Which pixel is which flake
 
-Snow uses 32 × 32 = 1024 flakes, so the solver textures are 32 × 32. A particle ID maps to a pixel by row and column. The solver goes from pixel to ID:
+The demo uses 32 × 32 = 1024 flakes by default, so the solver textures are 32 × 32. For the pictures in this post we turned it down to 16 × 16 = 256 smaller flakes, which looks more like light snow. A particle ID maps to a pixel by row and column. The solver goes from pixel to ID:
 
 ```glsl
 float getPID(vec2 fragCoord, float uMAXCOL){
@@ -129,10 +129,7 @@ const startTime = (row * MAXCOL + col) * duration / partiCount;
 posPixels.push(localX, localZ, size, startTime);
 ```
 
-The start times are spread over the duration, so flakes come out a few at a time instead of all at once. If you draw an emitter texture straight onto a quad you get this colorful mess, which is honestly just a picture of numbers:
-
-![A diamond shaped quad covered in bright stripes of pink, cyan and blue](./webgl-snow-framebuffer-solver/emitter-texture.png)
-*An emitter texture drawn as color, from the fire demo, which uses the same emitter. Red and green are the spawn position and blue is the size. The start time sits in alpha, so you can't see it here.*
+The start times are spread over the duration, so flakes come out a few at a time instead of all at once.
 
 ## Born, live, repeat
 
@@ -194,10 +191,10 @@ solverMaterial.setUniform('uFieldParams', fieldParams.flat());
 
 Because `solverParams` is on `window`, you can play with the weather from the browser console while it runs. Here's the same snow with only gravity, next to all four fields:
 
-![A thin column of snowflakes falling from the emitter, sparse toward the bottom](./webgl-snow-framebuffer-solver/snow-gravity-only.png)
-*Gravity only: `solverParams.vortexSwitcher = 0; solverParams.noiseSwitcher = 0; solverParams.dampSwitcher = 0`. Nothing slows the flakes down, so they speed up and the column thins out.*
+![Only a few snowflakes scattered across a dark blue sky](./webgl-snow-framebuffer-solver/snow-gravity-only.png)
+*Gravity only: `solverParams.vortexSwitcher = 0; solverParams.noiseSwitcher = 0; solverParams.dampSwitcher = 0`. Nothing slows the flakes down, so they rush through and only a few are on screen at once.*
 
-![A dense column of snowflakes drifting down from the emitter](./webgl-snow-framebuffer-solver/snow.png)
+![Many soft snowflakes spread across a dark blue sky](./webgl-snow-framebuffer-solver/snow.png)
 *All four fields on, the default. Damping keeps the flakes slow, so more of them hang in the air, and the vortex and noise give them a little wobble on the way down.*
 
 ## Drawing the flakes
@@ -213,11 +210,10 @@ gl_Position = _uni_projMat * _uni_viewMat * _uni_modelMat * vec4(position,1);
 gl_PointSize = vSize;
 ```
 
-In late April 2025 we went for pixel art snow instead of soft blobs. The fragment shader snaps `gl_PointCoord` to a small grid before measuring the distance to the center. With `uPixelNum = 4` each flake becomes a tiny chunky disc:
+The fragment shader turns each square point into a soft round flake. It measures how far the pixel is from the center of the point, keeps the middle solid, fades the edge out with `smoothstep`, and throws away the corners:
 
 ```glsl
-float pixelNum = uPixelNum / 2.0;
-vec2 p = floor((2.0 * (gl_PointCoord - 0.5))*pixelNum)/pixelNum;
+vec2 p = 2.0 * (gl_PointCoord - 0.5);
 float dist = length(p);
 
 if(vSize>1.0 && dist < uRadius) {
@@ -228,8 +224,24 @@ if(vSize>1.0 && dist < uRadius) {
 }
 ```
 
-![A close up of a few snowflakes, each made of a handful of square pixels](./webgl-snow-framebuffer-solver/snow-closeup.png)
-*Up close. Each flake is a 20 pixel point snapped to a 4 × 4 grid.*
+The flakes are drawn with additive blending, so where two of them overlap they just get a little brighter, and we never need to sort them.
+
+![A close up of a few soft, round snowflakes](./webgl-snow-framebuffer-solver/snow-closeup-smooth.png)
+*Up close. Each flake is a 20 pixel point with a solid middle and a soft edge.*
+
+## Bonus: pixel snow
+
+There is one more knob in that shader, `uPixelNum`. Before measuring the distance, we snap `gl_PointCoord` to a grid of `uPixelNum` × `uPixelNum` cells:
+
+```glsl
+float pixelNum = uPixelNum / 2.0;
+vec2 p = floor((2.0 * (gl_PointCoord - 0.5))*pixelNum)/pixelNum;
+```
+
+With a big value the grid is finer than the screen pixels, and you get the smooth flakes from the rest of this post. Turn it down and the flakes fall apart into chunky squares. At `uPixelNum = 4` every flake is a little 4 × 4 pixel art disc, which is how the demo ships by default.
+
+![The same close up, but every snowflake is a blocky 4 by 4 pixel disc](./webgl-snow-framebuffer-solver/snow-closeup-pixel.png)
+*The same 20 pixel flakes with `uPixelNum = 4`. Everything in this post before this section used a large value (64).*
 
 ## What we took away
 
