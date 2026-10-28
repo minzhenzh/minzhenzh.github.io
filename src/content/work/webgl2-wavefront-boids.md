@@ -4,9 +4,9 @@ summary: "How we move a crowd through a map on the GPU in WebGL2: a wavefront fi
 label: "Blog · WebGL"
 year: 2026
 date: 2026-04-05
-image: ./webgl2-wavefront-boids/flock-fish.png
+image: ./webgl2-wavefront-boids/fish-school.png
 imageAlt: "A school of colorful cartoon fish swimming through blue water between sandy rocks."
-video: /media/webgl2-wavefront-boids/flock-fish.mp4
+video: /media/webgl2-wavefront-boids/fish-school.mp4
 links:
   code: https://github.com/minzhenzh/webgl_engine/tree/boids
 ---
@@ -14,7 +14,7 @@ links:
 A hundred little agents, a map full of walls, and somewhere a target. We want them all to get there, around the walls, without piling on top of each other, and we want it all on the GPU.
 
 <figure>
-  <video src="/media/webgl2-wavefront-boids/flock-fish.mp4" poster="/media/webgl2-wavefront-boids/flock-fish.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
+  <video src="/media/webgl2-wavefront-boids/fish-school.mp4" poster="/media/webgl2-wavefront-boids/fish-school.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
   <figcaption>A hundred fish swimming around the rocks. Each click moves the target and the whole school turns. The fish are from Kenney's CC0 <a href="https://kenney.nl/assets/fish-pack">Fish Pack</a>.</figcaption>
 </figure>
 
@@ -101,7 +101,7 @@ fragData[1] = vec4(vVelocity, 0.0, 1.0);
 Divide by the count and you have the average position and velocity of everyone in your cell. That's all the boids rules need, and it costs one cheap draw call no matter how many agents there are. Here is the demo with every agent drawn as a plain dot:
 
 <figure>
-  <video src="/media/webgl2-wavefront-boids/flock-dots.mp4" poster="/media/webgl2-wavefront-boids/flock-dots.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
+  <video src="/media/webgl2-wavefront-boids/dot-school.mp4" poster="/media/webgl2-wavefront-boids/dot-school.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
   <figcaption>The same hundred boids as dots. We click twice and they flow around the rocks to each new target.</figcaption>
 </figure>
 
@@ -112,7 +112,7 @@ The fish at the top are the exact same simulation. We only swap the dot for a fi
 Next we wanted to give orders. In this version, 36 agents wait until you click. The click becomes the new target, the wavefront and the flow field are rebuilt from there, and the agents wake up and walk over:
 
 <figure>
-  <video src="/media/webgl2-wavefront-boids/click-dots.mp4" poster="/media/webgl2-wavefront-boids/click-dots.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
+  <video src="/media/webgl2-wavefront-boids/click-walk.mp4" poster="/media/webgl2-wavefront-boids/click-walk.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
   <figcaption>The agents sit still until the first click, then gather at the target. A second click sends them across the map.</figcaption>
 </figure>
 
