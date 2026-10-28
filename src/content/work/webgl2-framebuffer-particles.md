@@ -3,7 +3,7 @@ title: "The Same Particles, on Framebuffers, in WebGL2"
 summary: "We ported our transform feedback particle solver to framebuffers and float textures, so every WebGL2 effect can run on either one. Here is what changed, and how the two compare."
 label: "Blog · WebGL"
 year: 2026
-date: 2026-10-27
+date: 2026-01-17
 image: ./webgl2-framebuffer-particles/tf-vs-fb.png
 imageAlt: "The leaves demo twice, side by side: transform feedback on the left, framebuffer on the right, both full of falling autumn leaves."
 video: /media/webgl2-framebuffer-particles/tf-vs-fb.mp4
