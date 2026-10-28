@@ -138,7 +138,7 @@ float getAniType(vec2 vel) {
 
 ## What's still open
 
-We also tried a version where the steering is real acceleration instead of nudging the velocity directly. It moves more smoothly, but right now the character overshoots the target and keeps swinging past it, so it needs some kind of arrival or braking force before it's done. And the cat on the isometric grid is still test art. The fish worked out so well that the next version will probably get a proper CC0 character sheet too.
+We also tried a version where the steering is real acceleration instead of nudging the velocity directly. It moves more smoothly, but right now the character overshoots the target and keeps swinging past it, so it needs some kind of arrival or braking force before it's done.
 
 ## What we took away
 
