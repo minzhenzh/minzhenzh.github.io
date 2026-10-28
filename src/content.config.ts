@@ -17,6 +17,8 @@ const work = defineCollection({
       // Short label under the title, e.g. a venue, "Under review", or "Project".
       label: z.string(),
       year: z.number().int(),
+      // Optional, only for ordering: newer entries come first within the same year.
+      date: z.coerce.date().optional(),
       image: image(),
       imageAlt: z.string(),
       // Demos: an MP4 under public/media/ shown on the home card instead of the

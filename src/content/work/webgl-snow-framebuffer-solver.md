@@ -3,6 +3,7 @@ title: "Snow: A Particle Solver Made of Framebuffers"
 summary: "WebGL1 has no compute shaders, so we taught a fragment shader to run a particle simulation. This is how our snow demo keeps every flake alive on the GPU."
 label: "Blog · WebGL"
 year: 2025
+date: 2025-04-20
 image: ./webgl-snow-framebuffer-solver/snow.png
 imageAlt: "Soft round snowflakes drifting down a dark blue sky."
 video: /media/webgl-snow-framebuffer-solver/snow.mp4

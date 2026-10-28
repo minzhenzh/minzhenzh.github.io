@@ -3,6 +3,7 @@ title: "Particles with Transform Feedback in WebGL2"
 summary: "How our WebGL2 engine moves snow, rain, leaves and flowers entirely on the GPU, by letting the vertex shader write the next frame straight back into a buffer."
 label: "Blog · WebGL"
 year: 2025
+date: 2025-07-21
 image: ./webgl2-transform-feedback-particles/tf-overview.png
 imageAlt: "Four tall strips side by side: falling snow on a dark sky, slanted rain, autumn leaves on orange, and pink flower petals on blue."
 video: /media/webgl2-transform-feedback-particles/tf-overview.mp4
@@ -29,7 +30,7 @@ Transform feedback lets you record what a vertex shader outputs. Normally those 
 
 First we decided what a particle is. It ended up being 13 floats packed together:
 
-![A row of 13 colored boxes for one particle: pos xyz, linVel xyz, acc xyz, generation, size, frameLife, aniType. Below it, buffer A is read and buffer B is written by solver-vert.glsl, one instance per particle](./webgl2-transform-feedback-particles/tf-buffer-layout.png)
+![One particle as a row of fields: pos, vel and acc with 3 floats each, then gen, size, life and type with 1 each. Below it, buffer A goes through the vertex shader into buffer B, and they swap every frame](./webgl2-transform-feedback-particles/tf-buffer-layout.png)
 *One particle is 52 bytes in a vertex buffer. Each frame we read buffer A and write buffer B.*
 
 In the shader these are plain vertex attributes, one per field:

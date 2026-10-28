@@ -3,6 +3,7 @@ title: "The Same Particles, on Framebuffers, in WebGL2"
 summary: "We ported our transform feedback particle solver to framebuffers and float textures, so every WebGL2 effect can run on either one. Here is what changed, and how the two compare."
 label: "Blog · WebGL"
 year: 2026
+date: 2026-10-27
 image: ./webgl2-framebuffer-particles/tf-vs-fb.png
 imageAlt: "The leaves demo twice, side by side: transform feedback on the left, framebuffer on the right, both full of falling autumn leaves."
 video: /media/webgl2-framebuffer-particles/tf-vs-fb.mp4
@@ -48,8 +49,8 @@ gl.drawBuffers([
 
 A transform feedback particle is 13 floats in a row. A texture pixel holds 4. So each particle gets one pixel in each of four textures, at the same spot:
 
-![Four small texture grids with the same pixel highlighted, and next to each the four RGBA channels: slot 0 pos xyz and size, slot 1 vel xyz and generation, slot 2 acc xyz and frameLife, slot 3 aniType and three unused channels](./webgl2-framebuffer-particles/fb-texture-layout.png)
-*The same fields and colors as the transform feedback layout, just split into four RGBA pixels.*
+![A table with rows slot 0 to slot 3 and columns R, G, B, A: pos.x pos.y pos.z size, vel.x vel.y vel.z gen, acc.x acc.y acc.z life, and type with three unused channels](./webgl2-framebuffer-particles/fb-texture-layout.png)
+*The same 13 floats as in the transform feedback layout, split into one RGBA pixel in each of four textures.*
 
 Position, velocity and acceleration each take three channels, and the leftover fourth channels hold size, generation and frameLife. Only `aniType` needs a fourth texture, and three channels of it are spare.
 

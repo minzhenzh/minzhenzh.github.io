@@ -3,6 +3,7 @@ title: "Blast: Playing a Fire Animation from One Texture"
 summary: "How our WebGL1 blast effect plays a 36 frame fire animation on every particle, using nothing but a texture atlas and a bit of math in the shader."
 label: "Blog · WebGL"
 year: 2024
+date: 2024-12-01
 image: ./webgl-blast-texture-atlas/blast.png
 imageAlt: "A ring of glowing orange fire puffs on a grey background, rendered by the blast demo."
 video: /media/webgl-blast-texture-atlas/blast.mp4
