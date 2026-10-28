@@ -4,9 +4,9 @@ summary: "How we move a crowd through a map on the GPU in WebGL2: a wavefront fi
 label: "Blog · WebGL"
 year: 2026
 date: 2026-04-05
-image: ./webgl2-wavefront-boids/boids-flock-dots.png
-imageAlt: "About a hundred white dots swarming in the middle of a black map with red obstacles."
-video: /media/webgl2-wavefront-boids/boids-flock-dots.mp4
+image: ./webgl2-wavefront-boids/flock-fish.png
+imageAlt: "A school of colorful cartoon fish swimming through blue water between sandy rocks."
+video: /media/webgl2-wavefront-boids/flock-fish.mp4
 links:
   code: https://github.com/minzhenzh/webgl_engine/tree/boids
 ---
@@ -14,8 +14,8 @@ links:
 A hundred little agents, a map full of walls, and somewhere a target. We want them all to get there, around the walls, without piling on top of each other, and we want it all on the GPU.
 
 <figure>
-  <video src="/media/webgl2-wavefront-boids/boids-flock-dots.mp4" poster="/media/webgl2-wavefront-boids/boids-flock-dots.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
-  <figcaption>A hundred boids flocking around the red obstacles, each one a white dot.</figcaption>
+  <video src="/media/webgl2-wavefront-boids/flock-fish.mp4" poster="/media/webgl2-wavefront-boids/flock-fish.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
+  <figcaption>A hundred fish swimming around the rocks. Each click moves the target and the whole school turns. The fish are from Kenney's CC0 <a href="https://kenney.nl/assets/fish-pack">Fish Pack</a>.</figcaption>
 </figure>
 
 It took a few months and a lot of test versions to get here. This post walks through the idea in the order we built it: a map, a wavefront, a flow field, boids, and finally a character that walks along the field.
@@ -98,15 +98,22 @@ fragData[0] = vec4(vPosition, 1.0, 1.0);   // x, y, and 1 for the count
 fragData[1] = vec4(vVelocity, 0.0, 1.0);
 ```
 
-Divide by the count and you have the average position and velocity of everyone in your cell. That's all the boids rules need, and it costs one cheap draw call no matter how many agents there are. The video at the top is this demo: a hundred agents swarming between the obstacles.
+Divide by the count and you have the average position and velocity of everyone in your cell. That's all the boids rules need, and it costs one cheap draw call no matter how many agents there are. Here is the demo with every agent drawn as a plain dot:
+
+<figure>
+  <video src="/media/webgl2-wavefront-boids/flock-dots.mp4" poster="/media/webgl2-wavefront-boids/flock-dots.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
+  <figcaption>The same hundred boids as dots. We click twice and they flow around the rocks to each new target.</figcaption>
+</figure>
+
+The fish at the top are the exact same simulation. We only swap the dot for a fish sprite and turn it to face its velocity. The sprites face left, so a fish swimming right gets mirrored instead of rotated, otherwise it would swim upside down.
 
 ## Walking to a click
 
 Next we wanted to give orders. In this version, 36 agents wait until you click. The click becomes the new target, the wavefront and the flow field are rebuilt from there, and the agents wake up and walk over:
 
 <figure>
-  <video src="/media/webgl2-wavefront-boids/boids-walk.mp4" poster="/media/webgl2-wavefront-boids/boids-walk.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
-  <figcaption>After the click, the agents wake up and head for the target. The cat sprites are placeholder test art, which is why each agent shows a little block of frames.</figcaption>
+  <video src="/media/webgl2-wavefront-boids/click-dots.mp4" poster="/media/webgl2-wavefront-boids/click-dots.jpg" width="720" height="720" preload="none" muted loop playsinline></video>
+  <figcaption>The agents sit still until the first click, then gather at the target. A second click sends them across the map.</figcaption>
 </figure>
 
 With only 36 agents we kept it simple: for separation every agent just loops over all the other pixels. That's 36 × 36 checks, which the GPU doesn't even notice.
@@ -125,13 +132,13 @@ float getAniType(vec2 vel) {
 ```
 
 <figure>
-  <video src="/media/webgl2-wavefront-boids/velocity-field.mp4" poster="/media/webgl2-wavefront-boids/velocity-field.jpg" width="720" height="600" preload="none" muted loop playsinline></video>
+  <video src="/media/webgl2-wavefront-boids/velocity-field.mp4" poster="/media/webgl2-wavefront-boids/velocity-field.jpg" width="816" height="432" preload="none" muted loop playsinline></video>
   <figcaption>Click a tile and every arrow turns toward it, and the character walks along them.</figcaption>
 </figure>
 
 ## What's still open
 
-We also tried a version where the steering is real acceleration instead of nudging the velocity directly. It moves more smoothly, but right now the character overshoots the target and keeps swinging past it, so it needs some kind of arrival or braking force before it's done. And the sprites in this post are all test images. The next version will use proper CC0 character sheets.
+We also tried a version where the steering is real acceleration instead of nudging the velocity directly. It moves more smoothly, but right now the character overshoots the target and keeps swinging past it, so it needs some kind of arrival or braking force before it's done. And the cat on the isometric grid is still test art. The fish worked out so well that the next version will probably get a proper CC0 character sheet too.
 
 ## What we took away
 
