@@ -4,7 +4,7 @@ Isometric games draw a 3D-looking world with flat 2D sprites. The grid is turned
 
 ### Why we built it
 
-Our cat café game is built tile by tile in a level editor. Its 2024 web demo drew every sprite with Canvas 2D. This renderer moves that work to WebGL2: the placement happens in one vertex shader, and a whole layer of the café is drawn in a few batched draw calls.
+Our cat café game is built tile by tile in a level editor. Its 2024 web demo draws with Canvas 2D: JavaScript places every sprite and calls `drawImage` for each one, so the CPU's work grows with every cat and chair. The WebGL2 version moves that work to the GPU. The vertex shader places every sprite, the fragment shader picks animation frames, and once the map is sorted, a frame is just a time update and a few batched draw calls.
 
 ### What was hard
 

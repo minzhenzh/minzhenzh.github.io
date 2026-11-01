@@ -19,6 +19,21 @@ Annie and Cora's Café is our cat café game. Its world is an isometric grid: fl
 ![The editor's whole map: four café rooms standing on a large diamond grid of thin gray lines on black](./isometric-shader/whole-map.png)
 *The whole map in the editor. Every room, wall and cat stands on the same diamond grid.*
 
+## Why we moved it to the GPU
+
+The 2024 demo draws the café with Canvas 2D. JavaScript works out where each sprite goes and calls `drawImage` for it, one sprite at a time, in back-to-front order. That is simple, and it was enough for a demo. But every part of it grows with the number of sprites, and all of it runs on the CPU.
+
+The WebGL2 version splits the same job up differently:
+
+| | Canvas 2D (2024 demo) | WebGL2 (now) |
+|---|---|---|
+| Placing a sprite | JavaScript computes its position on screen | the vertex shader, from the cell index |
+| Drawing | one `drawImage` call per sprite | a few batched draw calls per layer |
+| Animation frames | JavaScript picks each sprite's frame | the fragment shader, from one time uniform |
+| Draw order | the order of the `drawImage` calls | sorted once, then kept by the depth buffer |
+
+So once a layer is sorted and its vertices are uploaded, a frame costs the CPU almost nothing. It updates `uTime` and issues one draw call per batch. Animated sprites, flipped furniture and the bounce on selected tiles all happen in the shaders. The vertex data only changes when the map changes, and even then the sort runs in small steps between frames, or in a web worker, so the editor keeps drawing while it works. And the café now lives in the same WebGL2 engine as our particle and crowd shaders.
+
 ## From a grid cell to the screen
 
 In an isometric view the grid is turned 45° and squashed to half its height, so every cell becomes a diamond twice as wide as it is tall. Moving one cell along the grid's x axis goes right and down on screen. Moving one cell along its y axis goes left and down. That is a 2D linear map, so it fits in one matrix:

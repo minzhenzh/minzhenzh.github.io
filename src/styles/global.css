@@ -490,6 +490,31 @@ button.contact-icon:hover,
   font-size: 0.85em;
 }
 
+/* Comparison tables: small sans, ruled rows, no boxes. */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.prose th {
+  font-weight: 600;
+  text-align: left;
+}
+
+.prose th,
+.prose td {
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+
+.prose td:first-child {
+  color: var(--muted);
+}
+
 /* Code blocks (Shiki colors them inline); long lines scroll instead of wrapping. */
 .prose pre {
   overflow-x: auto;

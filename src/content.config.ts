@@ -36,6 +36,8 @@ const work = defineCollection({
       // Submitted but not yet accepted: the project page shows a PDF link that
       // can't be clicked, marked "(under review)", until links.paper is set.
       underReview: z.boolean().default(false),
+      // Shown before everything else on the home page, whatever its date.
+      pinned: z.boolean().default(false),
       // Kept off the live site (still shown in `npm run dev`). See src/lib/content.ts.
       hidden: z.boolean().default(false),
       // Placeholder entry for previewing the layout. See src/lib/content.ts.
