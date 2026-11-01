@@ -4,15 +4,20 @@ summary: "How our WebGL2 engine draws an isometric café: one vertex shader turn
 label: "Blog · WebGL"
 year: 2026
 date: 2026-10-30
-image: ./isometric-shader/cat-cafe.png
-imageAlt: "Four pixel-art café rooms with cats, tables and shelves, standing on a diamond-shaped isometric grid on black."
+image: ./isometric-shader/cafe-rooms.png
+imageAlt: "Two pixel-art café rooms side by side: a warm brick room with a fireplace, bookshelf and a big black cat, and a pastel room with blue sofas, a pink fireplace and fluffy cats."
 links:
   demo: https://abobobox.itch.io/cat-cafe
 ---
 
 Annie and Cora's Café is our cat café game. Its world is an isometric grid: floor tiles, walls, furniture, cats and people, all standing on diamonds. Every one of them is a flat sprite, a rectangle cut out of a sprite sheet. Turning those rectangles into a room that looks right is almost entirely the job of one vertex shader, `iso-vert.glsl`. This post walks through what it does.
 
-*The overview above is the café's level editor from our 2024 web demo on itch.io, which still draws with Canvas 2D. The shaders in this post are the WebGL2 version of the same placement.*
+**[Play the café demo on itch.io ↗](https://abobobox.itch.io/cat-cafe)** It opens our level editor with four furnished rooms. Drag to look around, and use the magnifier to zoom in on the cats.
+
+*The screenshots in this post come from that demo, our 2024 web build, which still draws with Canvas 2D. The shaders below are the WebGL2 version of the same placement.*
+
+![The editor's whole map: four café rooms standing on a large diamond grid of thin gray lines on black](./isometric-shader/whole-map.png)
+*The whole map in the editor. Every room, wall and cat stands on the same diamond grid.*
 
 ## From a grid cell to the screen
 
@@ -45,6 +50,9 @@ For a tile, both multipliers are −0.5. Shifting left by half the width centers
 
 Notice that the vertical pivot uses the sprite's width, not its height. A table that covers 2 × 2 cells is twice as wide, its diamond is twice as tall, and its bottom corner is twice as far down. Using the width keeps that true for any footprint.
 
+![Close-up of the brick café room: a tall bookshelf, a fireplace, a window wall, two girls at a small table and a big black cat on a wooden floor](./isometric-shader/brick-room.png)
+*Tall sprites like the bookshelf and the window wall grow upward from their cell, while floor tiles, rugs and stools keep to theirs.*
+
 ## Why a character sits a quarter tile higher
 
 Characters use the same function with one difference: their vertical multiplier is −0.25 instead of −0.5.
@@ -59,6 +67,9 @@ Particles skip the pivot completely. They are positioned by their own center, so
 ## Drawing back to front
 
 In an isometric scene, things further back must be drawn first, or a cat behind a table ends up on top of it. Before drawing, the engine sorts each layer by `0.5 * (col + row)`, the sprite's distance down the screen. Furniture that covers more than one cell gets an extra pass of swaps, since a big sprite can be in front of one neighbor and behind another.
+
+![A row of fluffy cats lying along a wooden counter, partly hidden behind long tables and bar stools, with cakes and coffee cups on the counter behind them](./isometric-shader/cat-counter.png)
+*Cats, tables and stools overlap all along this counter. Each one has to be drawn after everything behind it.*
 
 Then the order is turned into depth. Each sprite in the sorted list gets a depth a little closer than the one before:
 
@@ -98,6 +109,9 @@ When the player selects tiles, they are marked in a small texture the size of th
 ## Many sheets in one draw
 
 A café uses many sprite sheets: floors, walls, furniture, each cat. Instead of one draw call per sheet, the engine packs several sheets into one batch with a best-fit-decreasing pass, up to eight per batch. Each vertex says which slot its sheet is in, and the fragment shader keeps a small array per slot: the sheet's cell size, its full size, and which textures hold it.
+
+![Close-up of the pastel café room: blue sofas and armchairs, pink tables, a pink fireplace, a blue bookshelf, a cat tree and many cats](./isometric-shader/pastel-room.png)
+*One room pulls from many sheets: walls, sofas, tables, shelves and a different sprite for every cat.*
 
 ## Sheets bigger than the GPU allows
 

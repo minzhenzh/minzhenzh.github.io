@@ -3,16 +3,23 @@ interface Props {
   links: Partial<Record<'paper' | 'code' | 'demo' | 'video', string>>;
 }
 
-const labels = { paper: 'Paper', code: 'Code', demo: 'Demo', video: 'Video' } as const;
+const labels = { paper: 'Paper', code: 'Code', demo: 'Play the demo ↗', video: 'Video' } as const;
 const entries = (Object.keys(labels) as (keyof typeof labels)[])
   .filter((key) => Astro.props.links[key])
-  .map((key) => ({ label: labels[key], href: Astro.props.links[key]! }));
+  .map((key) => ({ key, label: labels[key], href: Astro.props.links[key]! }));
 ---
 
+{/* A playable demo is the thing to try, so it gets a button instead of a plain link. */}
 {
-  entries.map(({ label, href }) => (
-    <a href={href} class="prose-link text-fg">
-      {label}
-    </a>
-  ))
+  entries.map(({ key, label, href }) =>
+    key === 'demo' ? (
+      <a href={href} class="demo-link">
+        {label}
+      </a>
+    ) : (
+      <a href={href} class="prose-link text-fg">
+        {label}
+      </a>
+    ),
+  )
 }

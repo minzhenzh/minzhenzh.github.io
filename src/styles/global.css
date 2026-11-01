@@ -392,6 +392,23 @@ button.contact-icon:hover,
   text-decoration-color: var(--fg);
 }
 
+/* Playable demos: a small outlined button that fills in on hover. */
+.demo-link {
+  display: inline-block;
+  padding: 0.15em 0.75em;
+  border: 1px solid var(--fg);
+  border-radius: 999px;
+  color: var(--fg);
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.demo-link:hover {
+  background-color: var(--fg);
+  color: var(--bg);
+}
+
 /* Markdown bodies (project pages). Text and figures share one reading width. */
 .prose > * + * {
   margin-top: 1em;
