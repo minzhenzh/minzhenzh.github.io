@@ -2,7 +2,7 @@
 // Project page for a work entry: header, overview figure, then the entry's
 // Markdown body as a short blog-style write-up.
 import { Image } from 'astro:assets';
-import { render } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AuthorList from '../../components/AuthorList.astro';
 import LinkRow from '../../components/LinkRow.astro';
@@ -19,6 +19,12 @@ const { title, authors, summary, label, year, image, imageAlt, video, links, und
 const { Content } = await render(entry);
 const { paper, ...otherLinks } = links;
 const frame = sketchRect(`${entry.id}-hero`, 160, 100);
+
+// Optional box under the header: the summary plus background, motivation and
+// what was hard, from src/content/work/<id>/brief.md.
+const brief = (await getCollection('briefs')).find((b) => b.id === entry.id);
+const Brief = brief && (await render(brief)).Content;
+const briefFrame = sketchRect(`${entry.id}-brief`, 160, 100, 0.8);
 ---
 
 <BaseLayout title={title} description={summary}>
@@ -49,7 +55,29 @@ const frame = sketchRect(`${entry.id}-hero`, 160, 100);
       </p>
     </header>
 
-    {summary && <p class="reveal mt-10 text-xl leading-[1.35] tracking-[-0.01em] sm:text-2xl" style="--reveal: 2">{summary}</p>}
+    {
+      Brief ? (
+        <aside class="reveal relative mt-10 px-6 py-7 sm:px-8" style="--reveal: 2" aria-label="About this project">
+          {summary && <p class="text-xl leading-[1.35] tracking-[-0.01em] sm:text-2xl">{summary}</p>}
+          <div class="brief prose mt-6 text-base leading-relaxed sm:text-lg">
+            <Brief />
+          </div>
+          <svg
+            class="sketch-frame pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+            viewBox="0 0 160 100"
+            preserveAspectRatio="none"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            {briefFrame.map((d) => <path d={d} vector-effect="non-scaling-stroke" />)}
+          </svg>
+        </aside>
+      ) : (
+        summary && <p class="reveal mt-10 text-xl leading-[1.35] tracking-[-0.01em] sm:text-2xl" style="--reveal: 2">{summary}</p>
+      )
+    }
 
     {/* Demo entries skip the overview: the demo video sits at the top of their body. */}
     {

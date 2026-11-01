@@ -22,7 +22,7 @@ It took a few months and a lot of test versions to get here. This post walks thr
 
 ## A map to walk on
 
-Everything starts with a grid. Each cell is either free or an obstacle, and one cell is the target. To make maps without typing coordinates, we built a small editor in January 2026. You click cells to make walls, click once more to place the target, and export the whole thing as JSON for the demos to load.
+Everything starts with a grid. Each cell is either free or an obstacle, and one cell is the target. To make maps without typing coordinates, we built a small editor, a plain HTML page with a 2D canvas, started in December 2025. You click cells to make walls, click once more to place the target, and export the whole thing as JSON for the demos to load.
 
 ![A 10 by 10 grid with two dark gray walls and a blue target cell marked e in the top right](./webgl2-wavefront-boids/grid-map.png)
 *The grid editor. Two walls, and the target `e` in the top right corner.*
@@ -75,6 +75,35 @@ There is one small rule for diagonals. If either of the two straight neighbors n
 
 ![The same grid with a green arrow in every cell, flowing around both walls toward the target](./webgl2-wavefront-boids/grid-gradient.png)
 *The flow field. Follow the arrows from any cell and you reach the target.*
+
+## Testing it on the CPU first
+
+Neither of these shaders was the first version. A shader is hard to debug: it can't print anything, you can't pause it, and a mistake usually shows up as a wrong color or an empty screen. So both steps first ran as ordinary JavaScript in the editor page. There the wavefront grows ring by ring: a list of the cells in the current ring, and a list of their unvisited neighbors that becomes the next ring. Then each cell picks the neighbor with the smallest distance as its arrow. Every number is a plain JavaScript value, easy to print and check.
+
+Moving to the GPU changed the shape of the algorithm. A fragment shader has no list to push cells into. It runs once for every pixel, all at the same time. So the rings became the rule above, "smallest neighbor plus one", applied to every cell every frame until the numbers stop changing.
+
+To make sure the GPU got the same answer, the GPU version stayed in the same editor page. After every pass it reads the framebuffer back to the CPU and writes the values into the same grid that the JavaScript version drew:
+
+```js
+const frameData = wavefrontSolver.readFramebuffer(gl);
+
+for (let i = 0; i < GRID_SIZE; i++)
+    for (let j = 0; j < GRID_SIZE; j++) {
+        grid[i][j].distance = frameData[4*(i*GRID_SIZE+j)];
+    }
+```
+
+So the numbers and arrows in the editor screenshots above come from the GPU, drawn the same way as the CPU result, and the two can be compared cell by cell.
+
+![The editor on a 10 by 10 map with gray walls and the target e in the top row; every cell shows its distance from the GPU, and wall cells show numbers above 100](./webgl2-wavefront-boids/grid-readback.png)
+*The GPU wavefront, read back into the editor. Gray cells are walls, so their numbers are over 100. This is the same map as the Spector.js capture below, with the target `e` at column 6, row 0.*
+
+## Looking inside a frame with Spector.js
+
+Reading the result back tells you that a pass went wrong, but not why. For that we used [Spector.js](https://spector.babylonjs.com/), a free Chrome extension for inspecting WebGL. You open a page, click the extension's icon and capture one frame. Spector then lists every WebGL call in that frame, in order. For each draw call it shows the shader source, the uniforms and textures that were bound, and what the framebuffer looked like afterwards. That makes it possible to go through a frame one pass at a time and check that each pass read the right texture, wrote to the right framebuffer, and got the right uniforms, such as the grid size and the target.
+
+![A Spector.js capture: a list of WebGL calls with one drawArraysInstanced call highlighted, the framebuffer's color attachments as previews on both sides, and a readPixels call further down](./webgl2-wavefront-boids/spector-capture.png)
+*A Spector.js capture of the editor. The highlighted call is one wavefront pass. Just above it, the textures are bound and the uniforms are set, including the grid size (10) and the target cell (6, 0). On the right is what the pass wrote into the framebuffer, and the `readPixels` below it is the readback into the editor.*
 
 ## Boids follow the arrows
 

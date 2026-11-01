@@ -6,7 +6,7 @@ import { z } from 'astro/zod';
 // entry also gets a page at /work/<id>/ rendered from its Markdown body. Put the
 // overview figure (and any figures the body uses) next to the .md file.
 const work = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/work' }),
+  loader: glob({ pattern: '*.md', base: './src/content/work' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -43,4 +43,15 @@ const work = defineCollection({
     }),
 });
 
-export const collections = { work };
+// The box at the top of a project page: background, why we built it, and what
+// was hard. Optional; lives next to the entry's figures as <id>/brief.md and
+// takes the entry's id.
+const briefs = defineCollection({
+  loader: glob({
+    pattern: '*/brief.md',
+    base: './src/content/work',
+    generateId: ({ entry }) => entry.replace(/\/brief\.md$/, ''),
+  }),
+});
+
+export const collections = { work, briefs };

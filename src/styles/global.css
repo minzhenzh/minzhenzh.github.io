@@ -422,6 +422,28 @@ button.contact-icon:hover,
   margin-top: 0.75em;
 }
 
+/* The box at the top of a project page: plain small labels, no marker swipe. */
+.brief h3 {
+  margin-top: 1.75em;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.brief h3:first-child {
+  margin-top: 0;
+}
+
+.brief h3 + * {
+  margin-top: 0.4em;
+}
+
+.brief li + li {
+  margin-top: 0.4em;
+}
+
 .prose strong {
   font-weight: 600;
 }
