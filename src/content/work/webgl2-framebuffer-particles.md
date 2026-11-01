@@ -56,7 +56,34 @@ Position, velocity and acceleration each take three channels, and the leftover f
 
 The texture is `MAXCOL × MAXCOL` pixels, so the particle count has to be a perfect square. Rain, leaves, flowers and arrows already were. Snow used 1000 particles, so we bumped it to 32 × 32 = 1024 to give both solvers exactly the same particles.
 
+## Why textures, not uniforms?
+
+There is a more obvious way to hand a shader a thousand particles: uniforms. Every parameter gets its own uniform array, with one entry per particle:
+
+```glsl
+uniform vec3  uPos[1024];
+uniform vec3  uVel[1024];
+uniform vec3  uAcc[1024];
+uniform float uSize[1024];
+uniform float uGeneration[1024];
+uniform float uFrameLife[1024];
+uniform float uAniType[1024];
+```
+
+That is far too much, for two reasons:
+
+* **Uniforms are read-only.** A shader can read them, but it can't write the next frame back. So the CPU has to update every particle itself and call `setUniform` for every parameter before every draw. That is exactly the work we wanted the GPU to do, plus a big upload each frame.
+* **They don't fit.** WebGL2 only guarantees 256 uniform vectors for a vertex shader and 224 for a fragment shader. Even packed tightly into `vec4`s, 1024 particles need 4096.
+
+A texture fixes both. The shader writes the next state into it by itself, so the particles never leave the GPU, and one 32 × 32 texture holds a slot for all 1024 of them. Uniforms are left for what they're good at: the few settings that are the same for every particle.
+
 ## Porting the solver
+
+This kind of solver is older than it looks. Keep the state in textures, draw one quad over the whole texture, and let a fragment shader compute the next value of every pixel: that is how people did general computation on GPUs before compute shaders existed. Mark Harris's fluid simulation chapter in [*GPU Gems*](https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-38-fast-fluid-dynamics-simulation-gpu) (2004) calls each such pass a *slab operation*, or slabop. Two textures take turns being read and written, the same swap our `FrameSolver` does every frame.
+
+The trick matters beyond particles. Around 2002 it got a name, GPGPU (general-purpose computing on GPUs), and people used it for physics, fluids and linear algebra, all disguised as drawing pictures. At Stanford, Ian Buck built BrookGPU, a language that hid the textures and shaders behind plain arrays and functions. He then joined NVIDIA, and that idea became CUDA in 2007, a way to program the GPU directly, without pretending to draw. Five years later, AlexNet was trained with CUDA on two NVIDIA gaming cards, and that is a big part of why AI runs on graphics cards today.
+
+WebGL2 still has no compute shaders (on the web they come with WebGPU), so for us the old way is still the way.
 
 The transform feedback solver is a vertex shader, `solver-vert.glsl`. The new one is a fragment shader, `particleSolver-frag.glsl`, and most of it is a straight copy: the same uniforms, the same force functions, the same spawn logic. Only the beginning and the end change.
 

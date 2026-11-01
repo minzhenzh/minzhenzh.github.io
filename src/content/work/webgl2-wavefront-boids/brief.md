@@ -12,4 +12,5 @@ Debugging on the GPU. A shader has no `console.log` and no breakpoints, and when
 
 * **CPU first.** The grid started as a plain HTML canvas page, with the wavefront and the arrows written in ordinary JavaScript, where every value can be printed and checked.
 * **A different shape on the GPU.** The CPU version grows the wave ring by ring from a list of cells. A fragment shader has no list; it updates every cell at once. So the algorithm became "take your smallest neighbor plus one", repeated every frame.
-* **Checked against the CPU.** The GPU version reads every pass back into the same page, so its numbers and arrows can be compared with the CPU's, cell by cell. For what happens inside a pass, we used the [Spector.js](https://spector.babylonjs.com/) Chrome extension.
+* **Checked against the CPU.** The GPU version reads every pass back into the same page, so its numbers and arrows can be compared with the CPU's, cell by cell.
+* **Looking inside the GPU.** A wrong number shows *that* a pass failed, not *why*. For that we used [Spector.js](https://spector.babylonjs.com/), a Chrome extension that captures one frame and shows every WebGL call, with the textures, uniforms and output of each draw.
