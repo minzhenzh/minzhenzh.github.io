@@ -2,7 +2,6 @@
 // Contact logos under the intro. The envelope opens a small panel with both
 // email addresses on hover, keyboard focus, or tap. A profile without an href
 // shows greyed out and unlinked until there is something to link to.
-import { sketchRect } from '../lib/sketch';
 
 interface Props {
   class?: string;
@@ -18,7 +17,7 @@ const profiles: { label: string; href?: string; icon: Exclude<keyof typeof icons
   { label: 'LinkedIn', icon: 'linkedin' }, // TODO: profile link
 ];
 
-// Brand marks are filled 24×24 paths; the envelope is a hand-drawn stroke.
+// Brand marks are filled 24×24 paths; the envelope is a pen stroke.
 const icons = {
   mail: { stroke: ['M3.4 6.6C8.9 6.2 15 6.1 20.6 6.5C20.9 10.2 20.8 14 20.4 17.6C14.9 18 9.1 18 3.6 17.5C3.2 13.9 3.1 10.2 3.4 6.4', 'M3.6 6.9C6.5 9.3 9.3 11.4 12.1 13C14.9 11.3 17.7 9.2 20.4 6.8'] },
   github: {
@@ -31,8 +30,6 @@ const icons = {
   },
 } as const;
 
-// The email panel gets a pencil frame like the work figures (viewBox ≈ its aspect).
-const frame = sketchRect('emails', 120, 44, 0.9);
 
 const { class: className, style } = Astro.props;
 ---
@@ -47,19 +44,8 @@ const { class: className, style } = Astro.props;
     </button>
     {/* pt-2 bridges the gap so the pointer can move from the icon into the panel. */}
     <div id="email-panel" class="email-panel absolute top-full -left-3 z-20 pt-2">
-      <div class="relative bg-bg px-4 py-3">
-        <svg
-          class="pointer-events-none absolute inset-0 h-full w-full overflow-visible text-sketch"
-          viewBox="0 0 120 44"
-          preserveAspectRatio="none"
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          aria-hidden="true"
-        >
-          {frame.map((d) => <path d={d} stroke-width="1.25" vector-effect="non-scaling-stroke" />)}
-        </svg>
-        <ul class="relative space-y-1.5 font-sans text-[14px] leading-5 whitespace-nowrap">
+      <div class="border border-rule bg-bg px-4 py-3">
+        <ul class="space-y-1.5 text-[13.5px] leading-5 whitespace-nowrap">
           {
             emails.map((email) => (
               <li>

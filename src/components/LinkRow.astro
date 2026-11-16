@@ -9,7 +9,7 @@ const entries = (Object.keys(labels) as (keyof typeof labels)[])
   .map((key) => ({ key, label: labels[key], href: Astro.props.links[key]! }));
 ---
 
-{/* A playable demo is the thing to try, so it gets a button instead of a plain link. */}
+{/* A playable demo is the thing to try, so its link is fully underlined. */}
 {
   entries.map(({ key, label, href }) =>
     key === 'demo' ? (

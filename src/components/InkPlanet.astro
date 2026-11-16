@@ -1,0 +1,175 @@
+---
+// The drawing beside the intro: a ringed planet in stipple, drawn on a canvas.
+// Thousands of ink dots sit on a sphere and a ring; more of them show where the
+// planet is in shadow, so it reads as shaded while it slowly turns. Each dot is
+// a particle: the pointer pushes nearby dots aside and they settle back.
+// Dots use the theme's ink colour. With reduced motion it is a still drawing.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<canvas data-ink-planet class:list={['block', className]} role="img" aria-label="A ringed planet drawn in ink dots, slowly turning"></canvas>
+
+<script>
+  import { animate, fitCanvas, hash, inkColors, noise3, onThemeChange, reducedMotion } from '../lib/ink';
+
+  const SPHERE_DOTS = 13000;
+  const RING_DOTS = 5200;
+  const STARS = 30;
+  // Light comes from the upper left, a little in front of the planet.
+  const LIGHT = [-0.56, -0.5, 0.66];
+  const TILT = 0.42; // the axis tips toward the viewer
+  const ROLL = -0.3; // and leans to the left
+  const SPIN = 0.16; // radians per second
+  const REACH = 74; // how far the pointer pushes, in CSS px
+  const PUSH = 26;
+
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-ink-planet]').forEach((canvas) => {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // One row per dot: position on the unit sphere (or in the ring's plane), a
+    // threshold that decides how much shadow it needs before it shows, how much
+    // "land" darkens it, its ring radius (0 on the sphere), and its push offset.
+    const count = SPHERE_DOTS + RING_DOTS;
+    const px = new Float32Array(count);
+    const py = new Float32Array(count);
+    const pz = new Float32Array(count);
+    const threshold = new Float32Array(count);
+    const land = new Float32Array(count);
+    const ring = new Float32Array(count);
+    const offsetX = new Float32Array(count);
+    const offsetY = new Float32Array(count);
+
+    for (let i = 0; i < SPHERE_DOTS; i++) {
+      const z = 1 - 2 * hash(i * 1.37 + 1);
+      const angle = 6.283 * hash(i * 2.11 + 5);
+      const r = Math.sqrt(1 - z * z);
+      px[i] = r * Math.cos(angle);
+      py[i] = r * Math.sin(angle);
+      pz[i] = z;
+      threshold[i] = hash(i * 3.71 + 9);
+      const patch = clamp((noise3(px[i] * 2.1 + 4, py[i] * 2.1 + 4, z * 2.1 + 4) - 0.46) / 0.12, 0, 1);
+      land[i] = patch * patch * (3 - 2 * patch);
+    }
+    for (let k = 0; k < RING_DOTS; k++) {
+      const i = SPHERE_DOTS + k;
+      const radius = 1.38 + 0.66 * hash(k * 1.91 + 3);
+      const angle = 6.283 * hash(k * 2.77 + 8);
+      px[i] = radius * Math.cos(angle);
+      pz[i] = radius * Math.sin(angle);
+      // A gap in the ring, and banding so it reads as rings and not a disc.
+      const inGap = radius > 1.74 && radius < 1.81;
+      threshold[i] = inGap || hash(k * 5.3 + 2) >= 0.5 + 0.34 * Math.sin(radius * 31) ? 2 : 0;
+      ring[i] = radius;
+    }
+    const stars = Array.from({ length: STARS }, (_, i) => [0.14 + 0.8 * hash(i * 9.1 + 2), hash(i * 4.7 + 6), hash(i * 2.3)]);
+
+    let width = 0;
+    let height = 0;
+    let time = 3;
+    let colors = inkColors();
+    let pointer: { x: number; y: number } | null = null;
+
+    const cosTilt = Math.cos(TILT);
+    const sinTilt = Math.sin(TILT);
+    const cosRoll = Math.cos(ROLL);
+    const sinRoll = Math.sin(ROLL);
+
+    function draw(dt = 0) {
+      time += dt;
+      ctx!.clearRect(0, 0, width, height);
+      const radius = Math.min(width, height) * 0.3;
+      const cx = width / 2;
+      const cy = height / 2;
+      const cosSpin = Math.cos(time * SPIN);
+      const sinSpin = Math.sin(time * SPIN);
+
+      ctx!.fillStyle = colors.pencil;
+      for (const [sx, sy, brightness] of stars) {
+        const x = sx * width;
+        const y = sy * height;
+        if (Math.hypot(x - cx, y - cy) < radius * 2.3) continue;
+        ctx!.globalAlpha = 0.35 + 0.5 * brightness;
+        ctx!.fillRect(x, y, 1.2, 1.2);
+      }
+
+      ctx!.fillStyle = colors.ink;
+      for (let i = 0; i < count; i++) {
+        // Spin about the axis, tip the axis toward the viewer, then roll it.
+        const x1 = px[i] * cosSpin + pz[i] * sinSpin;
+        const z1 = -px[i] * sinSpin + pz[i] * cosSpin;
+        const y2 = py[i] * cosTilt - z1 * sinTilt;
+        const z2 = py[i] * sinTilt + z1 * cosTilt;
+        const x3 = x1 * cosRoll - y2 * sinRoll;
+        const y3 = x1 * sinRoll + y2 * cosRoll;
+
+        let alpha: number;
+        if (ring[i]) {
+          // Hidden where the ring passes behind the planet.
+          if (threshold[i] > 1 || (z2 < 0 && x3 * x3 + y3 * y3 < 1)) alpha = 0;
+          else alpha = 0.9;
+        } else if (z2 < -0.02) {
+          alpha = 0;
+        } else {
+          const lit = Math.max(0, x3 * LIGHT[0] + y3 * LIGHT[1] + z2 * LIGHT[2]);
+          // Denser in shadow, along the rim (so the outline reads), and on land.
+          let density = 0.03 + 0.97 * Math.pow(1 - lit, 1.7);
+          density = Math.max(density, Math.pow(1 - z2, 5) * 0.98);
+          density = Math.min(1, density + land[i] * 0.42);
+          alpha = clamp((density - threshold[i]) / 0.08, 0, 1) * 0.95;
+        }
+
+        const sx = cx + x3 * radius;
+        const sy = cy + y3 * radius;
+        let targetX = 0;
+        let targetY = 0;
+        if (pointer) {
+          const dx = sx - pointer.x;
+          const dy = sy - pointer.y;
+          const distance = Math.hypot(dx, dy);
+          if (distance < REACH) {
+            const force = ((1 - distance / REACH) * PUSH) / (distance || 1);
+            targetX = dx * force;
+            targetY = dy * force;
+          }
+        }
+        offsetX[i] += (targetX - offsetX[i]) * 0.14;
+        offsetY[i] += (targetY - offsetY[i]) * 0.14;
+        if (alpha < 0.03) continue;
+
+        const size = 1.05 + (ring[i] ? hash(i) : threshold[i]) * 0.8;
+        ctx!.globalAlpha = alpha;
+        ctx!.fillRect(sx + offsetX[i] - size / 2, sy + offsetY[i] - size / 2, size, size);
+      }
+      ctx!.globalAlpha = 1;
+    }
+
+    const resize = () => {
+      ({ width, height } = fitCanvas(canvas, ctx));
+      draw();
+    };
+    new ResizeObserver(resize).observe(canvas);
+    onThemeChange(() => {
+      colors = inkColors();
+      draw();
+    });
+
+    canvas.addEventListener('pointermove', (event) => {
+      if (event.pointerType === 'touch' || reducedMotion.matches) return;
+      const box = canvas.getBoundingClientRect();
+      pointer = { x: event.clientX - box.left, y: event.clientY - box.top };
+    });
+    canvas.addEventListener('pointerleave', () => {
+      pointer = null;
+    });
+
+    resize();
+    animate(canvas, draw);
+  });
+</script>

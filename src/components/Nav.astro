@@ -1,38 +1,25 @@
 ---
-import HandwrittenName from './HandwrittenName.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
-// Research & Projects uses its pink pen on hover. Teaching is hidden on phones,
-// where the handwritten name leaves room for only one link.
+// Teaching is hidden on phones, where the name leaves room for only one link.
 const links = [
-  { href: '/#research', label: 'Research & Projects', pen: true },
-  { href: '/#teaching', label: 'Teaching', pen: false, wide: true },
+  { href: '/#research', label: 'Research & Projects' },
+  { href: '/#teaching', label: 'Teaching', wide: true },
 ];
 
 const normalize = (p: string) => (p.endsWith('/') ? p : `${p}/`);
 const current = normalize(Astro.url.pathname);
 ---
 
-<header class="reveal flex items-center justify-between gap-3 pt-8 sm:gap-6" style="--reveal: 0">
-  <a href="/" class="-my-1 block shrink-0" aria-current={current === '/' ? 'page' : undefined}>
-    <HandwrittenName class="h-[22px] sm:h-8" />
-  </a>
-  <div class="flex items-center gap-3 sm:gap-5">
+<header class="reveal flex items-baseline justify-between gap-4 pt-6 text-[13.5px] text-muted" style="--reveal: 0">
+  <a href="/" class="text-[15px] font-bold whitespace-nowrap text-fg" aria-current={current === '/' ? 'page' : undefined}>Minzhen Zhang</a>
+  <div class="flex items-baseline gap-5 sm:gap-10">
     <nav>
-      <ul class="flex gap-5 font-sans text-[13px]">
+      <ul class="flex gap-5 sm:gap-10">
         {
-          links.map(({ href, label, pen, wide }) => (
+          links.map(({ href, label, wide }) => (
             <li class:list={[wide && 'hidden sm:block']}>
-              <a
-                href={href}
-                aria-current={current === href ? 'page' : undefined}
-                class:list={[
-                  'whitespace-nowrap transition-colors hover:text-fg',
-                  pen && 'marker-hover pen-pink',
-                  current === href ? 'text-fg' : 'text-muted',
-                  current === href && pen && 'marker',
-                ]}
-              >
+              <a href={href} class="whitespace-nowrap transition-colors hover:text-fg">
                 {label}
               </a>
             </li>

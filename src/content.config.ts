@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-// Papers and projects, shown together as figure cards on the home page. Each
+// Papers and projects, shown together on the home page's sketched waves. Each
 // entry also gets a page at /work/<id>/ rendered from its Markdown body. Put the
 // overview figure (and any figures the body uses) next to the .md file.
 const work = defineCollection({
@@ -21,7 +21,7 @@ const work = defineCollection({
       date: z.coerce.date().optional(),
       image: image(),
       imageAlt: z.string(),
-      // Demos: an MP4 under public/media/ shown on the home card instead of the
+      // Demos: an MP4 under public/media/ shown on the home row instead of the
       // image (which becomes its poster), playing while hovered. The project
       // page then skips the overview figure; the body has the videos.
       video: z.string().optional(),

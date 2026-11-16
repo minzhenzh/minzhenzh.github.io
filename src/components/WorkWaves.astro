@@ -1,0 +1,177 @@
+---
+// Research & Projects on the home page: every entry's figure and title are
+// strung on a sketched wave. A canvas behind the list draws one pen line (and a
+// lighter pencil line beside it) through each row, edge to edge of the window;
+// the lines drift slowly and the one under the pointer stirs. The layout of the
+// rows is in global.css (.wave-*). On narrow screens the entries stack and the
+// waves become the lines between them.
+import type { CollectionEntry } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import AuthorList from './AuthorList.astro';
+import LinkRow from './LinkRow.astro';
+
+interface Props {
+  entries: CollectionEntry<'work'>[];
+}
+
+// Demo entries show their video instead; the image is its poster until hovered.
+const rows = await Promise.all(
+  Astro.props.entries.map(async (entry) => {
+    const { image, video } = entry.data;
+    const poster = video ? (await getImage({ src: image, width: Math.min(image.width, 1280) })).src : undefined;
+    return { entry, poster };
+  }),
+);
+---
+
+<div class="wave-list" data-waves>
+  <canvas class="wave-canvas" aria-hidden="true"></canvas>
+  <ul class="relative">
+    {
+      rows.map(({ entry, poster }) => {
+        const { title, authors, label, year, image, imageAlt, video, links } = entry.data;
+        // The figure and the title both open the entry's project page; only the
+        // title is a tab stop.
+        const href = `/work/${entry.id}/`;
+        return (
+          <li class="wave-row" data-wave-row>
+            <div class="wave-pair">
+              <a href={href} class="plate-link" tabindex="-1">
+                {video ? (
+                  <video
+                    src={video}
+                    poster={poster}
+                    width={image.width}
+                    height={image.height}
+                    style={`aspect-ratio: ${image.width} / ${image.height}`}
+                    preload="none"
+                    muted
+                    loop
+                    playsinline
+                    aria-label={imageAlt}
+                    class="plate figure"
+                    data-hover-video
+                  />
+                ) : (
+                  <Image src={image} alt={imageAlt} widths={[320, 640, 960]} sizes="(min-width: 768px) 280px, 100vw" class="plate figure" />
+                )}
+              </a>
+              <h3 class="wave-title" data-wave-title>
+                <a href={href}>{title}</a>
+              </h3>
+              <div class="wave-under">
+                {authors && <AuthorList authors={authors} class="mb-1.5 text-[13.5px] leading-relaxed" />}
+                <p class="flex flex-wrap gap-x-4 gap-y-0.5 text-[13px] leading-6 text-muted">
+                  <span>{year}</span>
+                  <span>{label}</span>
+                  <LinkRow links={links} />
+                </p>
+              </div>
+            </div>
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>
+
+<script>
+  import { animate, fitCanvas, inkColors, noise1, onThemeChange, reducedMotion } from '../lib/ink';
+
+  const narrow = matchMedia('(max-width: 47.99rem)');
+
+  document.querySelectorAll<HTMLElement>('[data-waves]').forEach((list) => {
+    const canvas = list.querySelector('canvas')!;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const rows = [...list.querySelectorAll<HTMLElement>('[data-wave-row]')];
+
+    let width = 0;
+    let height = 0;
+    let time = 3;
+    let colors = inkColors();
+    // One line per row: where it runs, and how stirred it is (1 = at rest).
+    let lines = rows.map((row) => ({ row, y: 0, stir: 1 }));
+
+    function draw(dt = 0) {
+      time += dt;
+      ctx!.clearRect(0, 0, width, height);
+      ctx!.lineJoin = ctx!.lineCap = 'round';
+      const swell = narrow.matches ? 4.5 : 8.5;
+      lines.forEach((line, i) => {
+        const hovered = !narrow.matches && !reducedMotion.matches && line.row.matches(':hover');
+        line.stir += ((hovered ? 2.1 : 1) - line.stir) * 0.07;
+        const a = swell * line.stir;
+        const phase = i * 2.4;
+
+        // A lighter pencil line first, wandering near the pen line.
+        ctx!.beginPath();
+        for (let x = -6; x <= width + 6; x += 6) {
+          const y = line.y + 5 + a * 1.25 * (0.6 * Math.sin(x * 0.0052 + phase * 1.7 + 2 - time * 0.21) + 0.4 * Math.sin(x * 0.0149 + phase * 0.6 + time * 0.16));
+          if (x < 0) ctx!.moveTo(x, y);
+          else ctx!.lineTo(x, y);
+        }
+        ctx!.strokeStyle = colors.pencil;
+        ctx!.globalAlpha = 0.5;
+        ctx!.lineWidth = 0.8;
+        ctx!.stroke();
+
+        // The pen line: three slow swells and a slight tremor of the hand.
+        ctx!.beginPath();
+        for (let x = -6; x <= width + 6; x += 6) {
+          const wave = 0.55 * Math.sin(x * 0.0061 + phase + time * 0.25) + 0.3 * Math.sin(x * 0.0137 + phase * 2.3 - time * 0.18) + 0.15 * Math.sin(x * 0.031 + phase * 0.7 + time * 0.33);
+          const y = line.y + a * wave + (noise1(x * 0.07 + i * 19) - 0.5) * 1.3;
+          if (x < 0) ctx!.moveTo(x, y);
+          else ctx!.lineTo(x, y);
+        }
+        ctx!.strokeStyle = colors.ink;
+        ctx!.globalAlpha = 1;
+        ctx!.lineWidth = 1.35;
+        ctx!.stroke();
+      });
+    }
+
+    // Each line runs through the middle of its title, or along the top of its
+    // entry when the entries are stacked.
+    function layout() {
+      ({ width, height } = fitCanvas(canvas, ctx!));
+      const top = canvas.getBoundingClientRect().top;
+      lines = lines.map((line) => {
+        const box = (narrow.matches ? line.row : line.row.querySelector('[data-wave-title]')!).getBoundingClientRect();
+        return { ...line, y: (narrow.matches ? box.top : box.top + box.height / 2) - top };
+      });
+      draw();
+    }
+    new ResizeObserver(layout).observe(list);
+    window.addEventListener('resize', layout);
+    document.fonts?.ready.then(layout);
+    onThemeChange(() => {
+      colors = inkColors();
+      draw();
+    });
+
+    layout();
+    animate(canvas, draw, 30);
+
+    // Card videos play only while the pointer (or keyboard focus) is on the
+    // row, then go back to the poster. Touch screens and reduced motion keep
+    // the poster.
+    rows.forEach((row) => {
+      const video = row.querySelector<HTMLVideoElement>('[data-hover-video]');
+      if (!video) return;
+      const play = () => {
+        if (!reducedMotion.matches) video.play().catch(() => {});
+      };
+      const stop = () => {
+        video.pause();
+        video.load(); // back to the poster; the clip stays in the HTTP cache
+      };
+      row.addEventListener('pointerenter', (event) => {
+        if (event.pointerType !== 'touch') play();
+      });
+      row.addEventListener('pointerleave', stop);
+      row.addEventListener('focusin', play);
+      row.addEventListener('focusout', stop);
+    });
+  });
+</script>

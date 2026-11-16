@@ -1,5 +1,5 @@
 ---
-// Comma-separated author list with Minzhen's own name in full ink.
+// Comma-separated author list with Minzhen's own name in full ink, underlined.
 interface Props {
   authors: string[];
   class?: string;
@@ -13,7 +13,7 @@ const { authors, class: className } = Astro.props;
   {
     authors.map((name, i) => (
       <>
-        <span class:list={[name === SELF && 'text-fg']}>{name}</span>
+        <span class:list={[name === SELF && 'term text-fg']}>{name}</span>
         {i < authors.length - 1 && ', '}
       </>
     ))
