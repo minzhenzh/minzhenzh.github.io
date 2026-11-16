@@ -95,7 +95,7 @@ for (let i = 0; i < GRID_SIZE; i++)
 
 So the numbers and arrows in the editor screenshots above come from the GPU, drawn the same way as the CPU result, and the two can be compared cell by cell.
 
-![The editor on a 10 by 10 map with gray walls and the target e in the top row; every cell shows its distance from the GPU, and wall cells show numbers above 100](./webgl2-wavefront-boids/grid-readback.png)
+![The editor on a 10 by 10 map with gray walls and the target e in the top row. Every cell shows its distance from the GPU, and wall cells show numbers above 100](./webgl2-wavefront-boids/grid-readback.png)
 *The GPU wavefront, read back into the editor. Gray cells are walls, so their numbers are over 100. This is the same map as the Spector.js capture below, with the target `e` at column 6, row 0.*
 
 ## Looking inside a frame with Spector.js
@@ -127,7 +127,7 @@ fragData[0] = vec4(vPosition, 1.0, 1.0);   // x, y, and 1 for the count
 fragData[1] = vec4(vVelocity, 0.0, 1.0);
 ```
 
-Divide by the count and you have the average position and velocity of everyone in your cell. That's all the boids rules need, and it costs one cheap draw call no matter how many agents there are. Here is the demo with every agent drawn as a plain dot:
+Divide by the count and you have the average position and velocity of everyone in your cell. The boids rules only need these averages, and they cost one cheap draw call however many agents there are. This is the demo with every agent drawn as a plain dot:
 
 <figure>
   <video src="/media/webgl2-wavefront-boids/dot-school.mp4" poster="/media/webgl2-wavefront-boids/dot-school.jpg" width="720" height="720" preload="none" muted loop playsinline></video>

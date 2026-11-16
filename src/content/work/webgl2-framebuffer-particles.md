@@ -1,6 +1,6 @@
 ---
 title: "The Same Particles, on Framebuffers, in WebGL2"
-summary: "We ported our transform feedback particle solver to framebuffers and float textures, so every WebGL2 effect can run on either one. Here is what changed, and how the two compare."
+summary: "We ported our transform feedback particle solver to framebuffers and float textures, so every WebGL2 effect can run on either one. This post covers what changed and how the two compare."
 label: "Blog · WebGL"
 year: 2026
 date: 2026-01-17
@@ -161,4 +161,4 @@ After running them side by side for a while, this is how we think about it:
 * **Transform feedback** fits particles best when each one only cares about itself. A particle is a vertex, the layout is any struct you like, the count can be any number, and there is no texture size to worry about.
 * **Framebuffers** win when particles need to see each other, or other grids. The whole state is a texture, so any pass can sample it: neighbors, a flow field, a density map. It's also easy to debug, because you can just draw the state textures on screen.
 
-In the video above you can't tell them apart, and that's the result we wanted. Next we want to try the case where the framebuffer version should really shine: particles that react to their neighbors.
+In the video above you can't tell them apart, which is the result we wanted. Next we want to try the case where the framebuffer version should do better, with particles that react to their neighbors.

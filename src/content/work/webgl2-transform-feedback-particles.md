@@ -70,11 +70,11 @@ gl.transformFeedbackVaryings(this.shaderProgram, this.varyings, gl.INTERLEAVED_A
 gl.linkProgram(this.shaderProgram);
 ```
 
-`INTERLEAVED_ATTRIBS` writes the outputs one after another, in the same 52 byte layout we read from. That's what lets the two buffers swap roles every frame.
+`INTERLEAVED_ATTRIBS` writes the outputs one after another, in the same 52 byte layout we read from. Because the layouts match, the two buffers can swap roles every frame.
 
 ## One frame of simulation
 
-Here is the whole update. Bind the current buffer for reading, bind the other one for writing, switch off the rasterizer, and draw:
+The whole update is short. Bind the current buffer for reading, bind the other one for writing, switch off the rasterizer, and draw:
 
 ```js
 gl.bindVertexArray(currVAO.vao);
@@ -133,7 +133,7 @@ vec3 turbulence(vec3 pos, float num, float amp, float speed, float freq, float e
 }
 ```
 
-Leaves and flowers turn it on. That's what makes them flutter instead of just falling.
+Leaves and flowers turn it on, which makes them flutter as they fall.
 
 ## Arrows: which way is it going?
 

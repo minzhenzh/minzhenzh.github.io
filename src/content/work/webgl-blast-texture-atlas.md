@@ -116,7 +116,7 @@ vec2 pointCoord = pointUV + vec2(gl_PointCoord.x / numCols, gl_PointCoord.y / nu
 gl_FragColor = texture2D(uColorSampler, pointCoord);
 ```
 
-That's the whole trick. One texture fetch per pixel and no branching.
+So each pixel needs one texture fetch and no branching.
 
 ## Where the puffs come from
 

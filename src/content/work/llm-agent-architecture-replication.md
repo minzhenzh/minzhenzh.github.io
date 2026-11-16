@@ -11,7 +11,7 @@ summary: "Do multi-agent LLM systems have to be re-tested for every new task? We
 label: "Under review at ACM TOSEM"
 year: 2026
 image: ./llm-agent-architecture-replication/study-overview.png
-imageAlt: "Study overview: a configuration space of three benchmarks, seven models, five agent architectures, model composition and inference backend; ten repeated runs per configuration; and analyses at three replication levels (RQ1–RQ5)."
+imageAlt: "Study overview: a configuration space of three benchmarks, seven models, five agent architectures, model composition and inference backend, ten repeated runs per configuration, and analyses at three replication levels (RQ1–RQ5)."
 underReview: true
 pinned: true
 ---
@@ -26,7 +26,7 @@ We organized the study as a three-level replication of Kim et al.:
 
 - **Direct replication (RQ1):** the original setting, Gemini 2.5 Flash on PlanCraft.
 - **Conceptual replication (RQ2):** six more models from three families (DeepSeek-V4, Qwen3.5 and Gemma-4) on three benchmarks: PlanCraft, WorkBench and SWE-Bench Verified.
-- **Extended replication (RQ3–RQ5):** heterogeneous teams that mix high- and low-capability models; quality of service (cost, execution time, hosted versus local inference, failures); and whether the original study's prediction function transfers to new data.
+- **Extended replication (RQ3–RQ5):** heterogeneous teams that mix high- and low-capability models, quality of service (cost, execution time, hosted versus local inference, failures), and whether the original study's prediction function transfers to new data.
 
 We compare five architectures (Single-Agent, Independent, Decentralized, Centralized and Hybrid) and run every configuration ten times.
 
@@ -70,6 +70,6 @@ Execution time tells the same story: the diamonds sit at about the same height a
 
 Task success remains partly task-dependent, but stability, model-composition and role-assignment patterns generalize across tasks, so not every architectural decision has to be re-validated from scratch. For evaluating LLM-powered agentic systems, we recommend that studies:
 
-- report distributions over repeated runs, and check that estimates have stabilized;
-- document the architecture implementation and the inference backend precisely;
+- report distributions over repeated runs, and check that estimates have stabilized,
+- document the architecture implementation and the inference backend precisely,
 - weigh task success together with cost and execution time.

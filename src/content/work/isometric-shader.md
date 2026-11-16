@@ -1,6 +1,6 @@
 ---
 title: "Isometric Sprites, Placed by the Vertex Shader"
-summary: "How our WebGL2 engine draws an isometric café: one vertex shader turns grid cells into diamonds and pins every sprite to its cell, and the fragment shader reads animation frames out of sprite sheets cut into slices."
+summary: "How our WebGL2 engine draws an isometric café. One vertex shader turns grid cells into diamonds and pins every sprite to its cell, and the fragment shader reads animation frames out of sprite sheets cut into slices."
 label: "Blog · WebGL"
 year: 2026
 date: 2026-10-30
@@ -10,7 +10,7 @@ links:
   demo: https://abobobox.itch.io/cat-cafe
 ---
 
-Annie and Cora's Café is our cat café game. Its world is an isometric grid: floor tiles, walls, furniture, cats and people, all standing on diamonds. Every one of them is a flat sprite, a rectangle cut out of a sprite sheet. Turning those rectangles into a room that looks right is almost entirely the job of one vertex shader, `iso-vert.glsl`. This post walks through what it does.
+Annie and Cora's Café is our cat café game. Its world is an isometric grid, where floor tiles, walls, furniture, cats and people all stand on diamonds. Every one of them is a flat sprite, a rectangle cut out of a sprite sheet. Turning those rectangles into a room that looks right is almost entirely the job of one vertex shader, `iso-vert.glsl`. This post walks through what it does.
 
 **[Play the café demo on itch.io ↗](https://abobobox.itch.io/cat-cafe)** It opens our level editor with four furnished rooms. Drag to look around, and use the magnifier to zoom in on the cats.
 
@@ -23,7 +23,7 @@ Annie and Cora's Café is our cat café game. Its world is an isometric grid: fl
 
 The 2024 demo draws the café with Canvas 2D. JavaScript works out where each sprite goes and calls `drawImage` for it, one sprite at a time, in back-to-front order. That is simple, and it was enough for a demo. But every part of it grows with the number of sprites, and all of it runs on the CPU.
 
-The WebGL2 version splits the same job up differently:
+The WebGL2 version splits the same job up differently.
 
 | | Canvas 2D (2024 demo) | WebGL2 (now) |
 |---|---|---|
@@ -32,11 +32,11 @@ The WebGL2 version splits the same job up differently:
 | Animation frames | JavaScript picks each sprite's frame | the fragment shader, from one time uniform |
 | Draw order | the order of the `drawImage` calls | sorted once, then kept by the depth buffer |
 
-So once a layer is sorted and its vertices are uploaded, a frame costs the CPU almost nothing. It updates `uTime` and issues one draw call per batch. Animated sprites, flipped furniture and the bounce on selected tiles all happen in the shaders. The vertex data only changes when the map changes, and even then the sort runs in small steps between frames, or in a web worker, so the editor keeps drawing while it works. And the café now lives in the same WebGL2 engine as our particle and crowd shaders.
+So once a layer is sorted and its vertices are uploaded, a frame costs the CPU almost nothing. It updates `uTime` and issues one draw call per batch. Animated sprites, flipped furniture and the bounce on selected tiles all happen in the shaders. The vertex data only changes when the map changes, and even then the sort runs in small steps between frames, or in a web worker, so the editor keeps drawing while it works. The café also shares the WebGL2 engine with our particle and crowd shaders now.
 
 ## From a grid cell to the screen
 
-In an isometric view the grid is turned 45° and squashed to half its height, so every cell becomes a diamond twice as wide as it is tall. Moving one cell along the grid's x axis goes right and down on screen. Moving one cell along its y axis goes left and down. That is a 2D linear map, so it fits in one matrix:
+In an isometric view the grid is turned 45° and squashed to half its height, so every cell becomes a diamond twice as wide as it is tall. Moving one cell along the grid's x axis goes right and down on screen. Moving one cell along its y axis goes left and down. That is a 2D linear map, so it fits in one matrix.
 
 ```glsl
 #define ISO_MAT(s) mat3(vec3( float(s)*0.5, -float(s)*0.25, 0), \
@@ -50,7 +50,7 @@ The same shader also draws top-down and platformer scenes. `GET_CANVAS_MAT` pick
 
 ## Hanging a sprite on its cell
 
-The matrix only places a point. The sprite is a quad, so each corner adds its `uv` times the sprite's size, and then the whole quad is shifted by a pivot:
+The matrix only places a point. The sprite is a quad, so each corner adds its `uv` times the sprite's size, and then the whole quad is shifted by a pivot.
 
 ```glsl
 vec3 origin = GET_CANVAS_MAT(mode, gridUnitSize)*position;
@@ -70,12 +70,12 @@ Notice that the vertical pivot uses the sprite's width, not its height. A table 
 
 ## Why a character sits a quarter tile higher
 
-Characters use the same function with one difference: their vertical multiplier is −0.25 instead of −0.5.
+Characters use the same function. The only difference is that their vertical multiplier is −0.25 instead of −0.5.
 
-![Left: a red test character with a green diamond and a small circle marking its footprint. Right: the same character over a white-outlined iso tile placed at the same grid index; the tile's box sits a quarter of its width lower than the character's](./isometric-shader/char-vs-tile.png)
+![Left: a red test character with a green diamond and a small circle marking its footprint. Right: the same character over a white-outlined iso tile placed at the same grid index, where the tile's box sits a quarter of its width lower than the character's](./isometric-shader/char-vs-tile.png)
 *A test character, alone and over an iso tile at the same grid index. The tile is pushed down by half its width, the character by only a quarter.*
 
-The reason is where each one is placed. Tiles sit on whole cells, so their position is the cell's index, the top corner of the diamond. Characters walk around freely, and we place them by their center: a character in cell `(col, row)` is at `(col + 0.5, row + 0.5)`. Half a cell along both grid axes is a quarter of a tile further down on screen. So the character's quad already starts a quarter tile lower, and only needs the other quarter from its pivot. Both quads end on the same bottom corner, and the character's feet, drawn a quarter tile above the bottom of its sprite, land in the middle of the tile.
+The reason is where each one is placed. Tiles sit on whole cells, so their position is the cell's index, the top corner of the diamond. Characters walk around freely, so we place them by their center. A character in cell `(col, row)` is at `(col + 0.5, row + 0.5)`. Half a cell along both grid axes is a quarter of a tile further down on screen. So the character's quad already starts a quarter tile lower, and only needs the other quarter from its pivot. Both quads end on the same bottom corner, and the character's feet, drawn a quarter tile above the bottom of its sprite, land in the middle of the tile.
 
 Particles skip the pivot completely. They are positioned by their own center, so `MODE_PARTI` sets both multipliers to zero.
 
@@ -86,7 +86,7 @@ In an isometric scene, things further back must be drawn first, or a cat behind 
 ![A row of fluffy cats lying along a wooden counter, partly hidden behind long tables and bar stools, with cakes and coffee cups on the counter behind them](./isometric-shader/cat-counter.png)
 *Cats, tables and stools overlap all along this counter. Each one has to be drawn after everything behind it.*
 
-Then the order is turned into depth. Each sprite in the sorted list gets a depth a little closer than the one before:
+Then the order is turned into depth. Each sprite in the sorted list gets a depth a little closer than the one before.
 
 ```js
 let depth = this.depthStart; //cam far-near     -100 --- 0
@@ -101,7 +101,7 @@ Depth goes into the matrix as the third coordinate and comes out unchanged. So t
 
 ## One vertex, 13 floats
 
-Every sprite is two triangles, six vertices, and every vertex carries everything the shaders need: 13 floats, 52 bytes.
+Every sprite is two triangles, six vertices, and every vertex carries everything the shaders need in 13 floats, or 52 bytes.
 
 * `mode`: flip bits, so one drawing can face left or right
 * `gridIndex`: the cell
@@ -111,7 +111,7 @@ Every sprite is two triangles, six vertices, and every vertex carries everything
 * `depth`: the draw order from above
 * `aniFrames` and `aniFPS`: the animation
 
-Flipping is done on the `uv` before placing the quad, so a mirrored chair needs no extra art. Animation works like in our [blast post](/work/webgl-blast-texture-atlas/): frames sit side by side in the sheet, and the fragment shader slides the rectangle along by the frame number:
+Flipping is done on the `uv` before placing the quad, so a mirrored chair needs no extra art. Animation works like in our [blast post](/work/webgl-blast-texture-atlas/). The frames sit side by side in the sheet, and the fragment shader slides the rectangle along by the frame number.
 
 ```glsl
 float frameIndex = floor(mod(uTime*vAniFPS,vAniFrames));
@@ -123,14 +123,14 @@ When the player selects tiles, they are marked in a small texture the size of th
 
 ## Many sheets in one draw
 
-A café uses many sprite sheets: floors, walls, furniture, each cat. Instead of one draw call per sheet, the engine packs several sheets into one batch with a best-fit-decreasing pass, up to eight per batch. Each vertex says which slot its sheet is in, and the fragment shader keeps a small array per slot: the sheet's cell size, its full size, and which textures hold it.
+A café uses many sprite sheets, for floors, walls, furniture and each of the cats. Instead of one draw call per sheet, the engine packs several sheets into one batch with a best-fit-decreasing pass, up to eight per batch. Each vertex says which slot its sheet is in, and the fragment shader keeps a small array per slot with the sheet's cell size, its full size, and the textures that hold it.
 
 ![Close-up of the pastel café room: blue sofas and armchairs, pink tables, a pink fireplace, a blue bookshelf, a cat tree and many cats](./isometric-shader/pastel-room.png)
-*One room pulls from many sheets: walls, sofas, tables, shelves and a different sprite for every cat.*
+*One room pulls from many sheets, for the walls, sofas, tables and shelves, and a different sprite for every cat.*
 
 ## Sheets bigger than the GPU allows
 
-The game also runs as a WeChat Mini Game, and on Android that platform limits how big one texture can be (8K). Our sheets can be bigger, so they are cut into slices, and the shader puts them back together. It first works out the pixel in the whole sheet, then finds the slice that contains it:
+The game also runs as a WeChat Mini Game, and on Android that platform limits how big one texture can be (8K). Our sheets can be bigger, so they are cut into slices, and the shader puts them back together. It first works out the pixel in the whole sheet, then finds the slice that contains it.
 
 ```glsl
 vec4 rdTexSlice(vec2 uv, vec2 texRes, int sliceStartIndex,int sliceEndIndex, vec4 slicedTexRange[MAX_TEXTURE_COUNT],sampler2D textures[MAX_TEXTURE_COUNT]){
@@ -146,12 +146,12 @@ vec4 rdTexSlice(vec2 uv, vec2 texRes, int sliceStartIndex,int sliceEndIndex, vec
 
 The test is half-open, `>=` at the start and `<` at the end, so a pixel right on a seam belongs to exactly one slice. Sampling the slice took two more workarounds. GLSL ES 3.00 only lets you index an array of samplers with a constant, so `sampleSlice` is a chain of `if (index == 0) …` lines, one per texture unit. And inside that kind of branch the GPU can't work out which mipmap level to use, so every lookup is a `textureLod` at level 0.
 
-One last detail: every lookup is pulled in by two texels from the cell's edge (`TEXEL_SHINK`). Without that, a lookup right at the border of a cell can pick up pixels of the neighboring sprite in the sheet.
+Finally, every lookup is pulled in by two texels from the cell's edge (`TEXEL_SHINK`). Without that, a lookup right at the border of a cell can pick up pixels of the neighboring sprite in the sheet.
 
 ## What we took away
 
-* An isometric view is one matrix. Everything else is choosing the right pivot.
-* Use the sprite's width for the vertical pivot, and multi-cell furniture lines up for free.
-* Things placed by their corner and things placed by their center need different pivots. A quarter tile is exactly the difference.
-* Sort back to front once, then hand the order to the depth buffer, and batches can be drawn in any order.
-* Platform limits shape the shader: texture size, constant sampler indices and mipmaps in branches all left their mark on `texture-slice.glsl`.
+* The isometric view itself is one matrix. Most of the work is in choosing the right pivot for each kind of sprite.
+* Using the sprite's width for the vertical pivot makes furniture that covers several cells line up too.
+* Sprites placed by their corner and sprites placed by their center need pivots a quarter tile apart.
+* Sorting back to front once and storing the order as depth means the batches can be drawn in any order.
+* The texture size limit, constant sampler indices and mipmaps inside branches are why `texture-slice.glsl` looks the way it does.

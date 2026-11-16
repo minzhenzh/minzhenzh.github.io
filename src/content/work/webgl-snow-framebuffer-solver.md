@@ -191,7 +191,7 @@ fieldParams[3] = [ solverParams.dampSwitcher, solverParams.dampScalar, 0, 0 ];
 solverMaterial.setUniform('uFieldParams', fieldParams.flat());
 ```
 
-Because `solverParams` is on `window`, you can play with the weather from the browser console while it runs. Here's the same snow with only gravity, next to all four fields:
+Because `solverParams` is on `window`, you can play with the weather from the browser console while it runs. Below is the same snow with only gravity, and then with all four fields:
 
 <figure>
   <video src="/media/webgl-snow-framebuffer-solver/snow-gravity-only.mp4" poster="/media/webgl-snow-framebuffer-solver/snow-gravity-only.jpg" width="960" height="720" preload="none" muted loop playsinline></video>
