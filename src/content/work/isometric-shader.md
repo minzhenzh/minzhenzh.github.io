@@ -130,7 +130,7 @@ A café uses many sprite sheets, for floors, walls, furniture and each of the ca
 
 ## Sheets bigger than the GPU allows
 
-The game also runs as a WeChat Mini Game, and on Android that platform limits how big one texture can be (8K). Our sheets can be bigger, so they are cut into slices, and the shader puts them back together. It first works out the pixel in the whole sheet, then finds the slice that contains it.
+GPUs limit how big one texture can be. Our sheets can be bigger than that, so they are cut into slices, and the shader puts them back together. It first works out the pixel in the whole sheet, then finds the slice that contains it.
 
 ```glsl
 vec4 rdTexSlice(vec2 uv, vec2 texRes, int sliceStartIndex,int sliceEndIndex, vec4 slicedTexRange[MAX_TEXTURE_COUNT],sampler2D textures[MAX_TEXTURE_COUNT]){

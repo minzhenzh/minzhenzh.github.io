@@ -15,7 +15,7 @@ Our earlier crowd demos moved boids over a map. This time the boids live in wate
 
 **[Play Shoal in your browser ↗](https://minzhenzh.github.io/WebGL-Fluid-Simulation/)** Drag to stir the water and watch the school get carried along. Press F and your cursor becomes a predator. The sliders button in the top right corner opens the settings, where you can change the school and switch between three themes.
 
-*The water is [WebGL Fluid Simulation](https://github.com/PavelDoGreat/WebGL-Fluid-Simulation) by Pavel Dobryakov, used under its MIT license. We added the fish, the link between fish and water, and the look. The picture at the top of this page is the predator mode.*
+*The water is [WebGL Fluid Simulation](https://github.com/PavelDoGreat/WebGL-Fluid-Simulation) by Pavel Dobryakov. We added the fish, the link between fish and water, and the look. The picture at the top of this page is the predator mode.*
 
 ## Two simulations in one frame
 

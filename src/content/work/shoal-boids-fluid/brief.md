@@ -4,7 +4,7 @@ Boids and fluids are two classic simulations. Boids are simple agents that stay 
 
 ### Why we built it
 
-We wanted a school of fish that really lives in the water. A current should carry the fish, and the fish should move the water and leave a trail in it. We started from Pavel Dobryakov's WebGL Fluid Simulation, which is MIT licensed, and added our boids to it. Everything had to stay on the GPU and run from plain files with no build step, so it can sit on a static page.
+We wanted a school of fish that really lives in the water. A current should carry the fish, and the fish should move the water and leave a trail in it. We started from Pavel Dobryakov's WebGL Fluid Simulation and added our boids to it. Everything had to stay on the GPU and run from plain files with no build step, so it can sit on a static page.
 
 ### What was hard
 
