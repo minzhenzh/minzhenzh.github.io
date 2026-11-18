@@ -30,11 +30,11 @@ this.AniIndex = (CAR_INDEX_OFFSET + Math.round(rot/deltaAngle))%CAR_MAX_IMG;
 
 `CAR_INDEX_OFFSET` (28) lines the first picture in the sheet up with the physics engine's zero angle. The box's position goes through the same isometric placement as every other sprite on the map, as in our [isometric post](/work/isometric-shader/). For depth, the renderer looks up the road cells under the car's box and takes their depth, so the car slots into the map's back-to-front order with the tiles around it.
 
-## Day one: drive to the next target
+## First try: drive to the next target
 
-The first NPC, in April 2026, had a list of target cells and drove straight at the next one. When it reached a target, it moved on to the next. Three laps was the goal.
+The first NPC had a list of target cells and drove straight at the next one. When it reached a target, it moved on to the next. Three laps was the goal.
 
-Driving straight at a target works on open ice, but not when a snow bank is in the way, and the car got stuck. Our notes from that day list a few ideas, like remembering the last state, stopping in the debugger when the car stops, and adding a random push to shake it loose. A random push would only hide the real problem, though. The car didn't know where the walls were.
+Driving straight at a target works on open ice, but not when a snow bank is in the way, and the car got stuck. We thought of a few quick fixes, like remembering the last state, stopping in the debugger when the car stops, and adding a random push to shake it loose. A random push would only hide the real problem, though. The car didn't know where the walls were.
 
 ## A*: a route around the walls
 
