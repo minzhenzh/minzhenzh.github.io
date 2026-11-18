@@ -10,6 +10,26 @@ imageAlt: "An NPC car on an isometric ice track leaving a trail of smoke puffs. 
 
 Our maze racer needs opponents. An NPC car has to drive around the track through a loop of checkpoints, three laps, without getting stuck on the snow banks. This post follows it from its first version to the one that races today, adding one piece at a time. From A* on, every stage has a short video, and the first four drive the same bend, so you can compare them.
 
+## The car is a flat picture
+
+Before the NPC, a word on the car itself. It isn't a 3D model. It is a sprite sheet with 32 pictures of the same vehicle, one for every 11.25° of a full turn.
+
+![32 pictures of a green utility vehicle in four rows, turning step by step through a full circle: rear view, then side, then front, then the other side, and back to the rear](./npc-racer/car-sheet.png)
+*The car's sprite sheet. One picture per 11.25° of heading, 32 in all.*
+
+We chose flat pictures over a 3D model for three reasons. They give the game its own drawn look, the same as the isometric tiles around the car. With enough angles and real physics underneath, the car still looks and moves like a 3D car as it turns and slides. And drawing one textured rectangle costs far less than a 3D car, so the game can run on almost any device.
+
+Underneath the picture, the car is a box in a 2D physics engine, Rapier. The engine pushes the box, and the box slides on the ice and bumps into walls with real momentum. The picture only has to follow it. Every frame, the renderer reads the box's angle and picks the picture closest to it.
+
+```js
+const deltaAngle = Math.PI*2/rowNum; // rowNum = 32
+let rot = this.collider._parent.rotation();
+rot = rot<0?rot+Math.PI*2:rot;
+this.AniIndex = (CAR_INDEX_OFFSET + Math.round(rot/deltaAngle))%CAR_MAX_IMG;
+```
+
+`CAR_INDEX_OFFSET` (28) lines the first picture in the sheet up with the physics engine's zero angle. The box's position goes through the same isometric placement as every other sprite on the map, as in our [isometric post](/work/isometric-shader/). For depth, the renderer looks up the road cells under the car's box and takes their depth, so the car slots into the map's back-to-front order with the tiles around it.
+
 ## Day one: drive to the next target
 
 The first NPC, in April 2026, had a list of target cells and drove straight at the next one. When it reached a target, it moved on to the next. Three laps was the goal.
