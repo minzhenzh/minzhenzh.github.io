@@ -1,0 +1,95 @@
+---
+// Research & Projects on the home page: one ruled row per entry, figure on the
+// left in a white frame of a fixed shape (the figure is shown whole inside it,
+// at its own aspect ratio), and the title, authors, summary and links beside
+// it. On phones the figure sits above the text. Layout is in global.css (.work-*).
+import type { CollectionEntry } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import AuthorList from './AuthorList.astro';
+import LinkRow from './LinkRow.astro';
+
+interface Props {
+  entries: CollectionEntry<'work'>[];
+}
+
+// Demo entries show their video instead; the image is its poster until hovered.
+const rows = await Promise.all(
+  Astro.props.entries.map(async (entry) => {
+    const { image, video } = entry.data;
+    const poster = video ? (await getImage({ src: image, width: Math.min(image.width, 1280) })).src : undefined;
+    return { entry, poster };
+  }),
+);
+---
+
+<ul class="work-list" data-work-list>
+  {
+    rows.map(({ entry, poster }) => {
+      const { title, authors, summary, label, year, image, imageAlt, video, links } = entry.data;
+      // The figure and the title both open the entry's page; only the title is a tab stop.
+      const href = `/work/${entry.id}/`;
+      return (
+        <li class="work-row" data-work-row>
+          <a href={href} class="work-frame" tabindex="-1">
+            {video ? (
+              <video
+                src={video}
+                poster={poster}
+                width={image.width}
+                height={image.height}
+                preload="none"
+                muted
+                loop
+                playsinline
+                aria-label={imageAlt}
+                class="figure"
+                data-hover-video
+              />
+            ) : (
+              <Image src={image} alt={imageAlt} widths={[320, 640, 960]} sizes="(min-width: 768px) 288px, 100vw" class="figure" />
+            )}
+          </a>
+          <div class="min-w-0">
+            <p class="text-[13px] text-muted">
+              {year} · {label}
+            </p>
+            <h3 class="work-title">
+              <a href={href}>{title}</a>
+            </h3>
+            {authors && <AuthorList authors={authors} class="mt-2 text-[13.5px] leading-relaxed" />}
+            {summary && <p class="mt-3 max-w-text font-serif text-[16px] leading-[1.6] text-fg/80">{summary}</p>}
+            {Object.keys(links).length > 0 && (
+              <p class="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[13px]">
+                <LinkRow links={links} />
+              </p>
+            )}
+          </div>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<script>
+  // Demo clips play only while the pointer (or keyboard focus) is on the row,
+  // then go back to the poster. Touch screens and reduced motion keep the poster.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-work-row]').forEach((row) => {
+    const video = row.querySelector<HTMLVideoElement>('[data-hover-video]');
+    if (!video) return;
+    const play = () => {
+      if (!reduced.matches) video.play().catch(() => {});
+    };
+    const stop = () => {
+      video.pause();
+      video.load(); // back to the poster; the clip stays in the HTTP cache
+    };
+    row.addEventListener('pointerenter', (event) => {
+      if (event.pointerType !== 'touch') play();
+    });
+    row.addEventListener('pointerleave', stop);
+    row.addEventListener('focusin', play);
+    row.addEventListener('focusout', stop);
+  });
+</script>

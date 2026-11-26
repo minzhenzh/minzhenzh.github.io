@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-// Papers and projects, shown together on the home page's sketched waves. Each
+// Papers and projects, shown together in the home page's project list. Each
 // entry also gets a page at /work/<id>/ rendered from its Markdown body. Put the
 // overview figure (and any figures the body uses) next to the .md file.
 const work = defineCollection({

@@ -2,9 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Contacts from '../components/Contacts.astro';
 import Heading from '../components/Heading.astro';
-import InkPlanet from '../components/InkPlanet.astro';
 import Placeholder from '../components/Placeholder.astro';
-import WorkWaves from '../components/WorkWaves.astro';
+import WorkList from '../components/WorkList.astro';
 import { getWork } from '../lib/content';
 
 const work = await getWork();
@@ -18,18 +17,15 @@ const teaching = [
 ---
 
 <BaseLayout title="Home">
-  {/* First page: a few typed lines and one drawing, nothing else. */}
-  <div class="grid items-center gap-x-4 gap-y-2 md:min-h-[min(70vh,44rem)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-    <div class="relative z-10 max-w-[31em] space-y-6 text-[15px] leading-[1.78] lg:text-[17px]">
-      <p data-typed>
-        I’m an M.Sc. student in Computer Science at the University of Guelph, under the supervision of Professor <a href="http://socs.uoguelph.ca/~lliao01/" class="prose-link">Lizhi Liao</a>.
-      </p>
-      <p class="after-typed">
-        I’m interested in <span class="term">software engineering</span>, <span class="term">computer graphics</span>, and <span class="term">game development</span>, particularly in <span class="term">building virtual worlds and characters</span>, and in understanding how they work through hands-on projects.
-      </p>
-      <Contacts class="after-typed" />
-    </div>
-    <InkPlanet class="reveal order-first aspect-[16/11] w-full md:order-none md:-ml-[4%] md:w-[112%] md:max-w-none" />
+  {/* Intro: two paragraphs and the contacts row, nothing else. */}
+  <div class="reveal max-w-[34em] space-y-6 pt-4 text-[15px] leading-[1.78] sm:pt-10 lg:text-[17px]" style="--reveal: 1">
+    <p>
+      I’m an M.Sc. student in Computer Science at the University of Guelph, under the supervision of Professor <a href="http://socs.uoguelph.ca/~lliao01/" class="prose-link">Lizhi Liao</a>.
+    </p>
+    <p>
+      I’m interested in <span class="term">software engineering</span>, <span class="term">computer graphics</span>, and <span class="term">game development</span>, particularly in <span class="term">building virtual worlds and characters</span>, and in understanding how they work through hands-on projects.
+    </p>
+    <Contacts />
   </div>
 
   {/* News: uncomment once there is something to announce.
@@ -42,12 +38,12 @@ const teaching = [
   </ul>
   */}
 
-  <section id="research" class="reveal scroll-mt-8 pt-20 sm:pt-28" style="--reveal: 2">
+  <section id="research" class="reveal scroll-mt-8 pt-24 sm:pt-32" style="--reveal: 2">
     <Heading>Research &amp; Projects</Heading>
     {
       work.length > 0 ? (
-        <div class="mt-4 sm:mt-6">
-          <WorkWaves entries={work} />
+        <div class="mt-8 sm:mt-10">
+          <WorkList entries={work} />
         </div>
       ) : (
         <div class="mt-6">
@@ -57,7 +53,7 @@ const teaching = [
     }
   </section>
 
-  <section id="teaching" class="reveal scroll-mt-8 pt-20 sm:pt-28" style="--reveal: 3">
+  <section id="teaching" class="reveal scroll-mt-8 pt-24 sm:pt-32" style="--reveal: 3">
     <Heading>Teaching</Heading>
     <p class="mt-2.5 text-[13.5px] text-muted">Teaching assistant, University of Guelph</p>
     <ul class="mt-6 max-w-[62em] space-y-2.5 text-[15px] lg:text-[17px]">
@@ -81,55 +77,3 @@ const teaching = [
     </ul>
   </section>
 </BaseLayout>
-
-<script>
-  // The intro's first sentence is typed out once; the rest of the intro fades
-  // in after it. Every letter is in the page from the start (hidden, then shown
-  // one by one), so nothing moves. With reduced motion the text is just there.
-  const paragraph = document.querySelector<HTMLElement>('[data-typed]');
-
-  if (paragraph && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const letters: HTMLElement[] = [];
-    const wrap = (node: Node) => {
-      [...node.childNodes].forEach((child) => {
-        if (child.nodeType !== Node.TEXT_NODE) return wrap(child);
-        const fragment = document.createDocumentFragment();
-        for (const character of child.textContent ?? '') {
-          const letter = document.createElement('span');
-          letter.className = 'typed-char';
-          letter.textContent = character;
-          fragment.append(letter);
-          letters.push(letter);
-        }
-        child.replaceWith(fragment);
-      });
-    };
-    // Leading and trailing whitespace of the source is not typed.
-    paragraph.normalize();
-    const first = paragraph.firstChild;
-    const last = paragraph.lastChild;
-    if (first?.nodeType === Node.TEXT_NODE) first.textContent = (first.textContent ?? '').trimStart();
-    if (last?.nodeType === Node.TEXT_NODE) last.textContent = (last.textContent ?? '').trimEnd();
-    wrap(paragraph);
-
-    const caret = document.createElement('span');
-    caret.className = 'typed-caret';
-    caret.setAttribute('aria-hidden', 'true');
-    paragraph.prepend(caret);
-    paragraph.classList.add('typing');
-
-    let typed = 0;
-    const type = () => {
-      const until = Math.min(letters.length, typed + 2);
-      for (; typed < until; typed++) letters[typed].classList.add('is-on');
-      letters[typed - 1].after(caret);
-      if (typed < letters.length) {
-        setTimeout(type, 26);
-      } else {
-        paragraph.classList.remove('typing');
-        setTimeout(() => caret.remove(), 2200);
-      }
-    };
-    setTimeout(type, 350);
-  }
-</script>
