@@ -1,10 +1,12 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 
-// Teaching is hidden on phones, where the name leaves room for only one link.
+// On phones the name leaves room for only one link, so only the CV shows there.
+// The CV is a PDF built from ~/Codes/resume/cv.tex without the phone number.
 const links = [
-  { href: '/#research', label: 'Research & Projects' },
+  { href: '/#research', label: 'Research & Projects', wide: true },
   { href: '/#teaching', label: 'Teaching', wide: true },
+  { href: '/Minzhen_Zhang_CV.pdf', label: 'CV' },
 ];
 
 const normalize = (p: string) => (p.endsWith('/') ? p : `${p}/`);
